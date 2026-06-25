@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MangaWorkflow.Domain\MangaWorkflow.Domain.csproj" />
+    <ProjectReference Include="..\MangaWorkflow.Infrastructure\MangaWorkflow.Infrastructure.csproj" />
+    <ProjectReference Include="..\MangaWorkflow.Infrastructure\MangaWorkflow.Infrastructure.csproj" />
+    <ProjectReference Include="..\MangaWorkflow.Application\MangaWorkflow.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

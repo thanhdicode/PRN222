@@ -1,0 +1,32 @@
+---
+description: Project rules for MangaWorkflow PRN222 ASP.NET Core big assignment
+globs:
+  - "**/*.cs"
+  - "**/*.cshtml"
+  - "**/*.razor"
+  - "**/*.json"
+  - "**/*.sql"
+  - "**/*.md"
+alwaysApply: true
+---
+
+# MangaWorkflow PRN222 Rules
+
+Build only what supports PRN222: MVC, Razor Pages, Blazor, SignalR, Worker Service, EF Core, SQL Server, DI, async/await.
+
+Before coding, read:
+
+1. `AGENTS.md`
+2. `docs/01_SRS.md`
+3. `docs/05_IMPLEMENTATION_PLAYBOOK.md`
+4. `docs/14_SCOPE_CONTROL_NO_OVERENGINEERING.md`
+
+Do not overengineer. No microservices, no CQRS, no payment, no real AI model training, no React SPA, no cloud-first architecture.
+
+Use services and repositories. Keep controllers and PageModels thin.
+
+Use async EF Core methods and CancellationToken where practical.
+
+Do not hardcode lookup IDs; query by StatusCode or use constants.
+
+Optional AI segmentation is a mock job using `AiSegmentationJobs` and `PageRegions.SourceType = AI`.

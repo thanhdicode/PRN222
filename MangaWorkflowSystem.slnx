@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="MangaWorkflow.Application/MangaWorkflow.Application.csproj" />
+  <Project Path="MangaWorkflow.Domain/MangaWorkflow.Domain.csproj" />
+  <Project Path="MangaWorkflow.Infrastructure/MangaWorkflow.Infrastructure.csproj" />
+  <Project Path="MangaWorkflow.Tools.DbSmokeTest/MangaWorkflow.Tools.DbSmokeTest.csproj" />
+  <Project Path="MangaWorkflow.Web/MangaWorkflow.Web.csproj" />
+  <Project Path="MangaWorkflow.Worker/MangaWorkflow.Worker.csproj" />
+</Solution>
