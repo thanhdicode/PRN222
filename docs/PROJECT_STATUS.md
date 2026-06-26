@@ -157,3 +157,4 @@ dotnet run --project MangaWorkflow.Web
 
 Give the agent the following prompt file:
 prompts/PHASE_2_IMPLEMENTATION_PROMPT.md
+

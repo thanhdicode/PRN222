@@ -1,0 +1,95 @@
+﻿@page
+@model MangaWorkflow.Web.Pages.Assistant.TaskInboxModel
+@{
+    ViewData["Title"] = "Task Inbox";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Task Inbox</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label asp-for="StatusFilter" class="col-form-label">Filter by Status:</label>
+                </div>
+                <div class="col-auto">
+                    <select asp-for="StatusFilter" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="Assigned">Assigned</option>
+                        <option value="InProgress">In Progress</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="RevisionRequired">Revision Required</option>
+                        <option value="Overdue">Overdue</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Task Title</th>
+                            <th>Type</th>
+                            <th>Series / Chapter</th>
+                            <th>Status</th>
+                            <th>Deadline</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in Model.TaskList)
+                        {
+                            var rowClass = task.IsOverdue ? "table-danger" : "";
+                            <tr class="@rowClass">
+                                <td>@task.Title</td>
+                                <td><span class="badge bg-secondary">@task.TypeName</span></td>
+                                <td>@task.SeriesTitle - @task.ChapterTitle (Page @task.PageNumber)</td>
+                                <td>
+                                    @{
+                                        var statusClass = task.StatusCode switch
+                                        {
+                                            "Assigned" => "bg-info text-dark",
+                                            "InProgress" => "bg-primary",
+                                            "Submitted" => "bg-warning text-dark",
+                                            "Approved" => "bg-success",
+                                            "Rejected" => "bg-danger",
+                                            "RevisionRequired" => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass">@task.StatusName</span>
+                                    @if (task.IsOverdue)
+                                    {
+                                        <span class="badge bg-danger ms-1">OVERDUE</span>
+                                    }
+                                </td>
+                                <td>@(task.Deadline?.ToString("yyyy-MM-dd") ?? "None")</td>
+                                <td>
+                                    <a asp-page="/Assistant/TaskDetail" asp-route-taskId="@task.TaskId" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.TaskList.Any())
+                        {
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No tasks found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@page
+@model MangaWorkflow.Web.Pages.Assistant.TaskDetailModel
+@{
+    ViewData["Title"] = "Task Detail";
+}
+
+<div class="container py-4">
+    <div class="mb-3">
+        <a asp-page="/Assistant/TaskInbox" class="btn btn-outline-secondary">&laquo; Back to Inbox</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (Model.Task == null)
+    {
+        <div class="alert alert-warning">Task not found or you do not have permission to view it.</div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">@Model.Task.Title</h4>
+                        <span class="badge bg-primary">@Model.Task.StatusName</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Instructions:</strong></p>
+                        <p class="text-muted">@(string.IsNullOrEmpty(Model.Task.Instructions) ? "None" : Model.Task.Instructions)</p>
+                        
+                        <hr />
+                        
+                        <p><strong>Deadline:</strong> @(Model.Task.Deadline?.ToString("f") ?? "None")</p>
+                    </div>
+                    <div class="card-footer bg-light">
+                        @if (Model.Task.StatusCode == "Assigned")
+                        {
+                            <form method="post" asp-page-handler="Start" asp-route-taskId="@Model.Task.TaskId">
+                                <button type="submit" class="btn btn-primary">Start Task</button>
+                            </form>
+                        }
+                        else if (Model.Task.StatusCode == "InProgress" || Model.Task.StatusCode == "RevisionRequired")
+                        {
+                            <a asp-page="/Assistant/SubmitTask" asp-route-taskId="@Model.Task.TaskId" class="btn btn-success">Submit Task</a>
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Page Image</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        @if (!string.IsNullOrEmpty(Model.Task.PageImageUrl))
+                        {
+                            <img src="@Model.Task.PageImageUrl" class="img-fluid rounded" alt="Page Reference" />
+                        }
+                        else
+                        {
+                            <p class="text-muted">No image available.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

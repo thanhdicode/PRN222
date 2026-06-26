@@ -1,0 +1,56 @@
+﻿@page
+@model MangaWorkflow.Web.Pages.Assistant.SubmitTaskModel
+@{
+    ViewData["Title"] = "Submit Task";
+}
+
+<div class="container py-4">
+    <div class="mb-3">
+        <a asp-page="/Assistant/TaskDetail" asp-route-taskId="@Model.Task?.TaskId" class="btn btn-outline-secondary">&laquo; Back to Task</a>
+    </div>
+
+    @if (Model.Task == null)
+    {
+        <div class="alert alert-warning">Task not found, or you cannot submit it at this time.</div>
+    }
+    else
+    {
+        <div class="card shadow-sm max-w-lg mx-auto">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Submit Work: @Model.Task.Title</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Input.TaskId" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="Input.Notes" class="form-label">Submission Notes (optional)</label>
+                        <textarea asp-for="Input.Notes" class="form-control" rows="4" placeholder="Describe what you did..."></textarea>
+                        <span asp-validation-for="Input.Notes" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.UploadedFile" class="form-label">Upload File (PNG, JPG, ZIP, PDF)</label>
+                        <input type="file" asp-for="Input.UploadedFile" class="form-control" />
+                        <div class="form-text">Or provide a URL below if file is too large.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Input.FileUrl" class="form-label">File URL (optional)</label>
+                        <input asp-for="Input.FileUrl" class="form-control" placeholder="https://..." />
+                        <span asp-validation-for="Input.FileUrl" class="text-danger"></span>
+                    </div>
+
+                    @if (!ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" asp-validation-summary="All"></div>
+                    }
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">Submit Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</div>

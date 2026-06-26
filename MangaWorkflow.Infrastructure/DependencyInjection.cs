@@ -26,6 +26,12 @@ namespace MangaWorkflow.Infrastructure
             services.AddScoped<IBoardVoteRepository, BoardVoteRepository>();
             services.AddScoped<IRankingRepository, RankingRepository>();
 
+            // Phase 3 repositories & services
+            services.AddScoped<ITaskSubmissionRepository, TaskSubmissionRepository>();
+            services.AddScoped<IEditorCommentRepository, EditorCommentRepository>();
+            services.AddScoped<IPageRegionRepository, PageRegionRepository>();
+            services.AddScoped<MangaWorkflow.Application.Interfaces.Services.IFileStorageService, MangaWorkflow.Infrastructure.FileStorage.LocalFileStorageService>();
+
             return services;
         }
     }

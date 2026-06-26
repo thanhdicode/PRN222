@@ -1,0 +1,61 @@
+﻿@page
+@model MangaWorkflow.Web.Pages.Mangaka.ReviewSubmissionsModel
+@{
+    ViewData["Title"] = "Review Submissions";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Review Pending Submissions</h2>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Assistant</th>
+                            <th>Task Title</th>
+                            <th>Submitted At</th>
+                            <th>File</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var sub in Model.Submissions)
+                        {
+                            <tr>
+                                <td><strong>@sub.AssistantName</strong></td>
+                                <td>@sub.TaskTitle</td>
+                                <td>@sub.SubmittedAt.ToString("g")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(sub.FileUrl))
+                                    {
+                                        <a href="@sub.FileUrl" target="_blank" class="btn btn-sm btn-outline-info">View File</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">None</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-page="/Mangaka/ReviewSubmissionDetail" asp-route-submissionId="@sub.SubmissionId" class="btn btn-sm btn-primary">Review</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Submissions.Any())
+                        {
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No pending submissions right now.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

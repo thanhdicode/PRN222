@@ -46,6 +46,7 @@
                                     <ul class="dropdown-menu" aria-labelledby="mangakaDropdown">
                                         <li><a class="dropdown-item" asp-area="Mangaka" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
                                         <li><a class="dropdown-item" asp-area="Mangaka" asp-controller="Series" asp-action="Index">My Series</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Mangaka/ReviewSubmissions">Review Submissions</a></li>
                                     </ul>
                                 </li>
                             }
@@ -59,6 +60,18 @@
                                         <li><a class="dropdown-item" asp-area="Board" asp-controller="Review" asp-action="Index">Series Review</a></li>
                                         <li><a class="dropdown-item" asp-area="Board" asp-controller="Rankings" asp-action="Index">Rankings</a></li>
                                     </ul>
+                                </li>
+                            }
+                            @if (User.IsInRole("Assistant"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-page="/Assistant/TaskInbox">My Tasks</a>
+                                </li>
+                            }
+                            @if (User.IsInRole("Editor") || User.IsInRole("TantouEditor") || User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="Mangaka" asp-controller="Series" asp-action="Index">Series (view pages)</a>
                                 </li>
                             }
                         }

@@ -1,0 +1,149 @@
+﻿@page
+@model MangaWorkflow.Web.Pages.Mangaka.PageRegionsModel
+@{
+    ViewData["Title"] = "Page Regions";
+}
+
+<div class="container-fluid py-4">
+    <!-- Back to Series/Chapter/Page from MVC area. Hardcoding back to Series list for demo -->
+    <div class="mb-3">
+        <a asp-area="Mangaka" asp-controller="Series" asp-action="Index" class="btn btn-outline-secondary">&laquo; Back to Series</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="row">
+        <!-- Left: Regions List -->
+        <div class="col-md-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Add New Region</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="AddRegion">
+                        <input type="hidden" asp-for="RegionInput.PageId" value="@Model.PageId" />
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-3">
+                                <label class="form-label">X</label>
+                                <input type="number" step="0.1" asp-for="RegionInput.X" class="form-control form-control-sm" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">Y</label>
+                                <input type="number" step="0.1" asp-for="RegionInput.Y" class="form-control form-control-sm" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">W</label>
+                                <input type="number" step="0.1" asp-for="RegionInput.Width" class="form-control form-control-sm" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label">H</label>
+                                <input type="number" step="0.1" asp-for="RegionInput.Height" class="form-control form-control-sm" required />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select asp-for="RegionInput.RegionTypeCode" class="form-select form-select-sm" required>
+                                <option value="">-- Select Type --</option>
+                                @foreach (var t in Model.RegionTypes)
+                                {
+                                    <option value="@t.TypeCode">@t.TypeName</option>
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <input asp-for="RegionInput.Notes" class="form-control form-control-sm" />
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add Region</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Existing Regions</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var r in Model.Regions)
+                    {
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-secondary">@r.RegionTypeName</span>
+                                    <small class="text-muted d-block">
+                                        [X:@r.X, Y:@r.Y, W:@r.Width, H:@r.Height]
+                                    </small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="collapse" data-bs-target="#createTask-@r.RegionId">
+                                    Create Task
+                                </button>
+                            </div>
+                            
+                            <div class="collapse mt-2" id="createTask-@r.RegionId">
+                                <div class="card card-body bg-light">
+                                    <form method="post" asp-page-handler="CreateTask">
+                                        <input type="hidden" asp-for="TaskInput.RegionId" value="@r.RegionId" />
+                                        <input type="hidden" name="pageId" value="@Model.PageId" />
+                                        <input type="hidden" asp-for="TaskInput.TaskTypeCode" value="Draw" /> <!-- Defaulting to Draw for simplicity -->
+
+                                        <div class="mb-2">
+                                            <input asp-for="TaskInput.Title" class="form-control form-control-sm" placeholder="Task Title (e.g. Draw background)" required />
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <select asp-for="TaskInput.AssignedToUserId" class="form-select form-select-sm" required>
+                                                <option value="">-- Assign To --</option>
+                                                @foreach (var a in Model.Assistants)
+                                                {
+                                                    <option value="@a.UserId">@a.FullName</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <input type="date" asp-for="TaskInput.Deadline" class="form-control form-control-sm" required />
+                                        </div>
+                                        
+                                        <div class="mb-2">
+                                            <textarea asp-for="TaskInput.Instructions" class="form-control form-control-sm" placeholder="Instructions..." rows="2"></textarea>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-success btn-sm w-100">Assign Task</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                    @if (!Model.Regions.Any())
+                    {
+                        <li class="list-group-item text-center text-muted py-3">No regions defined.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Right: Page Viewer Mock -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Page Preview</h5>
+                </div>
+                <div class="card-body bg-dark text-center p-5 rounded-bottom" style="min-height: 500px;">
+                    <!-- We could render absolute divs for regions here if we wanted a real visualizer -->
+                    <div class="text-light">
+                        <i class="bi bi-image" style="font-size: 4rem;"></i>
+                        <p class="mt-3">Page Preview Area</p>
+                        <small class="text-muted">In a real app, the page image is displayed here with overlay rectangles for regions based on X/Y/W/H.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
