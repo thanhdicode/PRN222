@@ -1,0 +1,51 @@
+@model MangaWorkflow.Application.DTOs.Chapters.EditChapterDto
+@{
+    ViewData["Title"] = "Edit Chapter";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h1 class="h3 mb-4">Edit Chapter @Model.ChapterNumber</h1>
+
+    <div class="card shadow-sm" style="max-width: 600px;">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="ChapterId" />
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="ChapterNumber" class="form-label"></label>
+                    <input asp-for="ChapterNumber" class="form-control" />
+                    <span asp-validation-for="ChapterNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Synopsis" class="form-label"></label>
+                    <textarea asp-for="Synopsis" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Synopsis" class="text-danger small"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="Deadline" class="form-label"></label>
+                    <input asp-for="Deadline" type="date" class="form-control" />
+                    <span asp-validation-for="Deadline" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a asp-action="Details" asp-route-id="@Model.ChapterId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

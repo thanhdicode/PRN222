@@ -1,0 +1,80 @@
+@model MangaWorkflow.Application.DTOs.Series.SeriesDetailDto
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">@Model.Title</h1>
+        <div>
+            @if (Model.StatusCode == "Draft")
+            {
+                <a asp-action="Edit" asp-route-id="@Model.SeriesId" class="btn btn-secondary me-2">Edit</a>
+                <form asp-action="Submit" asp-route-id="@Model.SeriesId" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success me-2" onclick="return confirm('Submit this series for board review? This action cannot be undone.')">Submit for Review</button>
+                </form>
+                <form asp-action="Delete" asp-route-id="@Model.SeriesId" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this series completely? This action cannot be undone.')">Delete</button>
+                </form>
+            }
+            else
+            {
+                <a asp-area="Mangaka" asp-controller="Chapters" asp-action="Index" asp-route-seriesId="@Model.SeriesId" class="btn btn-primary">Manage Chapters</a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+            {
+                <img src="@Model.CoverImageUrl" class="img-fluid rounded shadow-sm mb-3" alt="Cover" />
+            }
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8"><span class="badge bg-@(Model.StatusCode == "Draft" ? "secondary" : Model.StatusCode == "Submitted" ? "info" : "success")">@Model.StatusName</span></dd>
+                        
+                        <dt class="col-sm-5">Mangaka</dt>
+                        <dd class="col-sm-7">@Model.MangakaName</dd>
+
+                        <dt class="col-sm-4">Genre</dt>
+                        <dd class="col-sm-8">@Model.Genre</dd>
+
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("d")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Chapters (@Model.ChapterCount)</h5>
+                    <a asp-controller="Chapters" asp-action="Index" asp-route-seriesId="@Model.SeriesId" class="btn btn-sm btn-outline-primary">Manage Chapters</a>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">Use the Manage Chapters button to view and create chapters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -14,13 +14,20 @@ namespace MangaWorkflow.Infrastructure
             services.AddDbContext<MangaWorkflowDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
+            // Phase 1 repositories
             services.AddScoped<ISeriesRepository, SeriesRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IChapterRepository, ChapterRepository>();
             services.AddScoped<IProductionTaskRepository, ProductionTaskRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
 
+            // Phase 2 repositories
+            services.AddScoped<IPageRepository, PageRepository>();
+            services.AddScoped<IBoardVoteRepository, BoardVoteRepository>();
+            services.AddScoped<IRankingRepository, RankingRepository>();
+
             return services;
         }
     }
 }
+

@@ -1,0 +1,49 @@
+@model MangaWorkflow.Application.DTOs.Pages.PageDetailDto
+@{
+    ViewData["Title"] = $"Page {Model.PageNumber}";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Page @Model.PageNumber (v@(Model.VersionNumber))</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-area="Mangaka" asp-controller="Series" asp-action="Index">My Series</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Mangaka" asp-controller="Chapters" asp-action="Details" asp-route-id="@Model.ChapterId">Chapter</a></li>
+                    <li class="breadcrumb-item"><a asp-area="Mangaka" asp-controller="Pages" asp-action="Index" asp-route-chapterId="@Model.ChapterId">Pages</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Details</li>
+                </ol>
+            </nav>
+        </div>
+        <a asp-action="Index" asp-route-chapterId="@Model.ChapterId" class="btn btn-outline-secondary">Back to Pages</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm text-center bg-light">
+                <img src="@Model.ImageUrl" class="img-fluid p-3" alt="Page @Model.PageNumber" style="max-height: 800px; object-fit: contain;" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7"><span class="badge bg-secondary">@Model.StatusName</span></dd>
+                        
+                        <dt class="col-sm-5">Version</dt>
+                        <dd class="col-sm-7">@Model.VersionNumber</dd>
+
+                        <dt class="col-sm-5">Uploaded By</dt>
+                        <dd class="col-sm-7">@Model.UploadedByName</dd>
+
+                        <dd class="col-sm-7">@Model.UploadedAt.ToString("g")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+@model MangaWorkflow.Application.DTOs.Chapters.ChapterDetailDto
+@{
+    ViewData["Title"] = $"Chapter {Model.ChapterNumber}";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Chapter @Model.ChapterNumber: @Model.Title</h1>
+            <p class="text-muted mb-0">Series: @Model.SeriesTitle</p>
+        </div>
+        <div>
+            @if (Model.StatusCode == "Draft")
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ChapterId" class="btn btn-secondary me-2">Edit Chapter</a>
+                <form asp-action="StartProduction" asp-route-id="@Model.ChapterId" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success me-2" onclick="return confirm('Move this chapter to In Production? This will allow uploading pages and tracking tasks.')">Start Production</button>
+                </form>
+            }
+            <a asp-area="Mangaka" asp-controller="Pages" asp-action="Index" asp-route-chapterId="@Model.ChapterId" class="btn btn-primary">Manage Pages</a>
+            <a asp-action="Index" asp-route-seriesId="@Model.SeriesId" class="btn btn-outline-secondary ms-2">Back</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8"><span class="badge bg-primary">@Model.StatusName</span></dd>
+                        
+                        <dt class="col-sm-4">Number</dt>
+                        <dd class="col-sm-8">@Model.ChapterNumber</dd>
+
+                        <dt class="col-sm-4">Deadline</dt>
+                        <dd class="col-sm-8">@Model.Deadline?.ToString("d")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Synopsis</h5>
+                    <p class="card-text" style="white-space: pre-wrap;">@(string.IsNullOrWhiteSpace(Model.Synopsis) ? "No synopsis provided." : Model.Synopsis)</p>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Page Summary</h5>
+                    <p>Total Pages: <strong>@Model.TotalPages</strong></p>
+                    <a asp-area="Mangaka" asp-controller="Pages" asp-action="Index" asp-route-chapterId="@Model.ChapterId" class="btn btn-outline-primary btn-sm">View Pages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

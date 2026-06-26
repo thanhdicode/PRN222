@@ -1,0 +1,87 @@
+@model List<MangaWorkflow.Application.DTOs.Rankings.RankingListItemDto>
+@{
+    ViewData["Title"] = "Series Rankings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Series Rankings</h1>
+        <a asp-action="Create" class="btn btn-primary">+ Add Ranking Record</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <label class="form-label mb-0 fw-bold">Issue Number:</label>
+                </div>
+                <div class="col-auto">
+                    <select name="issueNumber" class="form-select" onchange="this.form.submit()">
+                        <option value="">Latest Rankings</option>
+                        @foreach (var issue in (List<string>)ViewBag.Issues)
+                        {
+                            <option value="@issue" selected="@(issue == ViewBag.SelectedIssue ? "selected" : null)">@issue</option>
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width: 80px;">Rank</th>
+                        <th>Series</th>
+                        <th>Issue</th>
+                        <th>Trend</th>
+                        <th>Calculated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <h4 class="mb-0 @(item.RankPosition <= 3 ? "text-primary fw-bold" : "")">@item.RankPosition</h4>
+                            </td>
+                            <td>
+                                <strong>@item.SeriesTitle</strong>
+                            </td>
+                            <td>@item.IssueNumber</td>
+                            <td>
+                                @if (item.Trend == "Up")
+                                {
+                                    <span class="text-success fw-bold">↑ Up</span>
+                                }
+                                else if (item.Trend == "Down")
+                                {
+                                    <span class="text-danger fw-bold">↓ Down</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fw-bold">− Stable</span>
+                                }
+                            </td>
+                            <td>@(item.CalculatedAt.ToString("g"))</td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No rankings found for this issue.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿# PRN222 MangaWorkflowSystem — Project Status
+# PRN222 MangaWorkflowSystem — Project Status
 
 ## Current Phase: Phase 2 — ASP.NET Core MVC CRUD (NEXT)
 
@@ -13,8 +13,8 @@
 |---|---|---|---|
 | Phase 0 | Database Ready | ✅ DONE | — |
 | Phase 1 | Foundation, Scaffold, DI | ✅ DONE | Ch01-Ch03 |
-| Phase 2 | ASP.NET Core MVC CRUD | ⏳ NEXT | Ch04 |
-| Phase 3 | Razor Pages Workflow | 🔒 Locked | Ch05 |
+| Phase 2 | ASP.NET Core MVC CRUD | ✅ DONE | Ch04 |
+| Phase 3 | Razor Pages Workflow | ⏳ NEXT | Ch05 |
 | Phase 4 | Blazor + SignalR | 🔒 Locked | Ch06, Ch07 |
 | Phase 5 | Worker + Final Demo | 🔒 Locked | Ch08 |
 
@@ -56,22 +56,22 @@ Completed: 2026-06-25
 
 ---
 
-## ⏳ Phase 2 — ASP.NET Core MVC CRUD (NEXT)
+## ✅ Phase 2 — ASP.NET Core MVC CRUD (DONE)
 
-Status: NOT STARTED
+Status: DONE
 PRN222: Chapter 04 ASP.NET Core MVC
 
 ### Target deliverables
-- [ ] Cookie authentication (Login/Logout)
-- [ ] Admin Area: User management CRUD
-- [ ] Mangaka Area: Series CRUD + submit flow
-- [ ] Mangaka Area: Chapter CRUD
-- [ ] Mangaka Area: Manga Page management + file upload
-- [ ] Board Area: Series Review + voting
-- [ ] Board Area: Ranking management
-- [ ] Role-based navigation menu
-- [ ] All Area routes registered
-- [ ] All new services/repos in DependencyInjection.cs
+- [x] Cookie authentication (Login/Logout)
+- [x] Admin Area: User management CRUD
+- [x] Mangaka Area: Series CRUD + submit flow
+- [x] Mangaka Area: Chapter CRUD
+- [x] Mangaka Area: Manga Page management + file upload
+- [x] Board Area: Series Review + voting
+- [x] Board Area: Ranking management
+- [x] Role-based navigation menu
+- [x] All Area routes registered
+- [x] All new services/repos in DependencyInjection.cs
 
 ### Completion gate
 Must pass ALL before marking done:
@@ -89,9 +89,9 @@ See prompts/PHASE_2_IMPLEMENTATION_PROMPT.md
 
 ---
 
-## 🔒 Phase 3 — Razor Pages Workflow (LOCKED)
+## ⏳ Phase 3 — Razor Pages Workflow (NEXT)
 
-Locked until Phase 2 is DONE.
+Status: NOT STARTED
 PRN222: Chapter 05 Razor Pages
 
 ### Target deliverables

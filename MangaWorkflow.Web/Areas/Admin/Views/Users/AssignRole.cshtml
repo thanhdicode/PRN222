@@ -1,0 +1,41 @@
+@model MangaWorkflow.Application.DTOs.Users.AssignRoleDto
+@{
+    ViewData["Title"] = "Assign Role";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h1 class="h3 mb-4">Assign Role to User</h1>
+
+    <div class="card shadow-sm" style="max-width: 500px;">
+        <div class="card-body">
+            <p class="mb-4"><strong>User:</strong> @ViewBag.UserEmail</p>
+
+            <form asp-action="AssignRole" method="post">
+                <input type="hidden" asp-for="UserId" />
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <div class="mb-4">
+                    <label asp-for="RoleCode" class="form-label">Role</label>
+                    <select asp-for="RoleCode" class="form-select">
+                        <option value="">-- Select Role --</option>
+                        @foreach (var role in (List<MangaWorkflow.Domain.Entities.Role>)ViewBag.Roles)
+                        {
+                            <option value="@role.RoleCode">@role.RoleName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="RoleCode" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Assign Role</button>
+                    <a asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

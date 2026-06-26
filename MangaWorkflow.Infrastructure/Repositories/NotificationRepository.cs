@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MangaWorkflow.Infrastructure.Persistence;
 using MangaWorkflow.Application.Interfaces.Repositories;
+using MangaWorkflow.Domain.Entities;
 
 namespace MangaWorkflow.Infrastructure.Repositories
 {
@@ -16,5 +17,22 @@ namespace MangaWorkflow.Infrastructure.Repositories
         {
             return await _context.Notifications.CountAsync(n => n.UserId == userId && n.IsRead == false, cancellationToken);
         }
+
+        public async Task<NotificationType?> GetTypeByCodeAsync(string typeCode, CancellationToken ct = default)
+        {
+            return await _context.NotificationTypes
+                .FirstOrDefaultAsync(t => t.TypeCode == typeCode, ct);
+        }
+
+        public async Task AddAsync(Notification notification, CancellationToken ct = default)
+        {
+            await _context.Notifications.AddAsync(notification, ct);
+        }
+
+        public async Task SaveChangesAsync(CancellationToken ct = default)
+        {
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }
+

@@ -1,0 +1,60 @@
+@model MangaWorkflow.Application.DTOs.Rankings.CreateRankingDto
+@{
+    ViewData["Title"] = "Add Ranking";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h1 class="h3 mb-4">Add Ranking Record</h1>
+
+    <div class="card shadow-sm" style="max-width: 600px;">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="SeriesId" class="form-label">Series</label>
+                    <select asp-for="SeriesId" class="form-select">
+                        <option value="">-- Select Series --</option>
+                        @foreach (var series in (List<MangaWorkflow.Application.DTOs.Series.SeriesListItemDto>)ViewBag.SeriesList)
+                        {
+                            <option value="@series.SeriesId">@series.Title</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SeriesId" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="IssueNumber" class="form-label"></label>
+                    <input asp-for="IssueNumber" class="form-control" placeholder="e.g. 2024-42" />
+                    <span asp-validation-for="IssueNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RankPosition" class="form-label"></label>
+                    <input asp-for="RankPosition" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="RankPosition" class="text-danger small"></span>
+                </div>
+                
+                <div class="mb-4">
+                    <label asp-for="TrendCode" class="form-label">Trend</label>
+                    <select asp-for="TrendCode" class="form-select">
+                        <option value="Stable">Stable</option>
+                        <option value="Up">Up</option>
+                        <option value="Down">Down</option>
+                    </select>
+                    <span asp-validation-for="TrendCode" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Ranking</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

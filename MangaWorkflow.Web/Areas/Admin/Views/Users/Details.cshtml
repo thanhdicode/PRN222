@@ -1,0 +1,84 @@
+@model MangaWorkflow.Application.DTOs.Users.UserDetailDto
+@{
+    ViewData["Title"] = "User Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">User Details: @Model.FullName</h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-secondary me-2">Edit User</a>
+            <a asp-action="AssignRole" asp-route-id="@Model.UserId" class="btn btn-primary me-2">Assign Role</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to Users</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4 text-center">
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                    {
+                        <img src="@Model.AvatarUrl" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar" />
+                    }
+                    else
+                    {
+                        <div class="bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white mx-auto mb-3" style="width: 150px; height: 150px; font-size: 3rem;">
+                            @(Model.FullName?.Substring(0, 1).ToUpper() ?? "U")
+                        </div>
+                    }
+                    <h5 class="card-title">@Model.FullName</h5>
+                    <p class="text-muted mb-2">@Model.Email</p>
+                    <div class="mb-3">
+                        @if (Model.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header"><h5 class="mb-0">Roles</h5></div>
+                <div class="card-body">
+                    @if (Model.Roles.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var role in Model.Roles)
+                            {
+                                <span class="badge bg-primary px-3 py-2 fs-6">@role</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No roles assigned.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header"><h5 class="mb-0">Account Information</h5></div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">User ID</dt>
+                        <dd class="col-sm-8 text-muted">@Model.UserId</dd>
+                        
+                        <dd class="col-sm-8">@Model.CreatedAt.ToString("F")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

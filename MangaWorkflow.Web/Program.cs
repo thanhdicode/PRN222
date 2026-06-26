@@ -1,10 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using MangaWorkflow.Application;
 using MangaWorkflow.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add MVC + Razor Pages + Blazor (Blazor/SignalR wired in later phases)
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -13,8 +12,30 @@ builder.Services.AddSignalR();
 // Database context & Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Services
+// Application Services
 builder.Services.AddApplicationServices();
+
+// --- Cookie Authentication (Phase 2) ---
+builder.Services.AddAuthentication("MangaWorkflowCookie")
+    .AddCookie("MangaWorkflowCookie", options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest;
+    });
+
+// Authorization policies per role
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("MangakaOnly", policy => policy.RequireRole("Mangaka"));
+    options.AddPolicy("BoardMember", policy => policy.RequireRole("BoardMember"));
+    options.AddPolicy("AdminOrBoard", policy => policy.RequireRole("Admin", "BoardMember"));
+});
 
 var app = builder.Build();
 
@@ -22,22 +43,28 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
+// Authentication must come before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+// Area routes — areas must be mapped before the default route
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-// app.MapHub<NotificationHub>("/hubs/notifications"); // To be implemented in later phases
+// app.MapHub<NotificationHub>("/hubs/notifications"); // Phase 4 SignalR
 
 app.Run();
+

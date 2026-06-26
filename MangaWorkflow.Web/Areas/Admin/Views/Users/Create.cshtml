@@ -1,0 +1,55 @@
+@model MangaWorkflow.Application.DTOs.Users.CreateUserDto
+@{
+    ViewData["Title"] = "Create User";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h1 class="h3 mb-4">Create New User</h1>
+
+    <div class="card shadow-sm" style="max-width: 600px;">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label"></label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RoleCode" class="form-label"></label>
+                    <select asp-for="RoleCode" class="form-select">
+                        <option value="">-- Select Role (optional) --</option>
+                        @foreach (var role in (List<MangaWorkflow.Domain.Entities.Role>)ViewBag.Roles)
+                        {
+                            <option value="@role.RoleCode">@role.RoleName</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

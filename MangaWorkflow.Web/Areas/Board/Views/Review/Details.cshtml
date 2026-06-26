@@ -1,0 +1,119 @@
+@model MangaWorkflow.Application.DTOs.Board.BoardSeriesDetailDto
+@{
+    var voteSummary = (MangaWorkflow.Application.DTOs.Board.VoteSummaryDto)ViewBag.VoteSummary;
+    ViewData["Title"] = $"Review: {Model.Title}";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Review: @Model.Title</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Submissions</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Details</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            @if (User.HasClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "BoardMember"))
+            {
+                @if (Model.CurrentMemberHasVoted)
+                {
+                    <span class="btn btn-secondary disabled me-2">Vote Submitted</span>
+                }
+                else
+                {
+                    <a asp-action="Vote" asp-route-id="@Model.SeriesId" class="btn btn-primary me-2">Submit Vote</a>
+                }
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p class="card-text" style="white-space: pre-wrap;">@Model.Description</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header"><h5 class="mb-0">Voting Summary</h5></div>
+                <div class="card-body">
+                    <p>Total Votes: <strong>@voteSummary.TotalVotes</strong></p>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Vote</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var vote in Model.Votes)
+                                {
+                                    <tr>
+                                        <td>@vote.BoardMemberName</td>
+                                        <td>
+                                            @if (vote.VoteCode == "Approve")
+                                            {
+                                                <span class="badge bg-success">@vote.VoteName</span>
+                                            }
+                                            else if (vote.VoteCode == "Reject")
+                                            {
+                                                <span class="badge bg-danger">@vote.VoteName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">@vote.VoteName</span>
+                                            }
+                                        </td>
+                                        <td>@vote.Comment</td>
+                                    </tr>
+                                }
+                                @if (!Model.Votes.Any())
+                                {
+                                    <tr><td colspan="3" class="text-muted text-center">No votes cast yet.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+            {
+                <img src="@Model.CoverImageUrl" class="img-fluid rounded shadow-sm mb-3" alt="Cover" />
+            }
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Details</h5>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7"><span class="badge bg-info">@Model.StatusName</span></dd>
+                        
+                        <dt class="col-sm-5">Genre</dt>
+                        <dd class="col-sm-7">@Model.Genre</dd>
+
+                        <dt class="col-sm-5">Mangaka</dt>
+                        <dd class="col-sm-7">@Model.MangakaName</dd>
+
+                        <dt class="col-sm-5">Submitted</dt>
+                        <dd class="col-sm-7">@Model.SubmittedAt?.ToString("d")</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

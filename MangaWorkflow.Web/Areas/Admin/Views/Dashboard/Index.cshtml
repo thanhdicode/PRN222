@@ -1,0 +1,66 @@
+@model MangaWorkflow.Application.DTOs.DashboardSummaryDto
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <h1 class="h3 mb-4">Admin Dashboard</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">@TempData["Success"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1 small">Total Users</p>
+                    <h4 class="fw-bold">@Model.TotalUsers</h4>
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1 small">Total Series</p>
+                    <h4 class="fw-bold">@Model.TotalSeries</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1 small">Total Chapters</p>
+                    <h4 class="fw-bold">@Model.TotalChapters</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1 small">Production Tasks</p>
+                    <h4 class="fw-bold">@Model.TotalTasks</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Quick Actions</div>
+                <div class="card-body">
+                    <a asp-area="Admin" asp-controller="Users" asp-action="Index" class="btn btn-outline-primary me-2 mb-2">Manage Users</a>
+                    <a asp-area="Admin" asp-controller="Rankings" asp-action="Index" class="btn btn-outline-secondary mb-2">View Rankings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
