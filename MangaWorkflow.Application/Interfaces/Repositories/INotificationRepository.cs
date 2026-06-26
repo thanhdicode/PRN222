@@ -6,6 +6,7 @@ namespace MangaWorkflow.Application.Interfaces.Repositories
     {
         Task<int> CountUnreadNotificationsAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<NotificationType?> GetTypeByCodeAsync(string typeCode, CancellationToken ct = default);
+        Task AddTypeAsync(NotificationType type, CancellationToken ct = default);
         Task AddAsync(Notification notification, CancellationToken ct = default);
         Task<List<Notification>> GetUnreadAsync(Guid userId, CancellationToken ct = default);
         Task<Notification?> GetByIdAsync(Guid notificationId, CancellationToken ct = default);

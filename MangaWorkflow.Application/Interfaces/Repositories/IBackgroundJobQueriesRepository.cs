@@ -8,7 +8,7 @@ namespace MangaWorkflow.Application.Interfaces.Repositories
 {
     public interface IBackgroundJobQueriesRepository
     {
-        Task<bool> HasRecentNotificationAsync(Guid userId, string notificationType, string title, TimeSpan withinTimeSpan, CancellationToken ct);
+        Task<bool> HasRecentNotificationAsync(Guid userId, string notificationType, string title, TimeSpan withinTimeSpan, CancellationToken ct, string? referenceType = null, Guid? referenceId = null);
         Task<List<Series>> GetSeriesForRankingRiskAsync(CancellationToken ct);
         Task UpdateSeriesCancellationRiskAsync(Guid seriesId, decimal riskScore, CancellationToken ct);
         Task<int> CleanupOldReadNotificationsAsync(int daysOld, CancellationToken ct);

@@ -54,5 +54,14 @@ namespace MangaWorkflow.Infrastructure.Repositories
                 await _context.SaveChangesAsync(ct);
             }
         }
+
+        public async Task<System.Collections.Generic.List<BackgroundJobLog>> GetRecentLogsAsync(int count, CancellationToken ct = default)
+        {
+            return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+                System.Linq.Queryable.Take(
+                    System.Linq.Queryable.OrderByDescending(_context.BackgroundJobLogs, l => l.StartedAt), 
+                    count), 
+                ct);
+        }
     }
 }

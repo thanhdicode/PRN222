@@ -10,5 +10,6 @@ namespace MangaWorkflow.Application.Interfaces.Repositories
         Task<BackgroundJobLog> StartJobAsync(string workerName, CancellationToken ct = default);
         Task CompleteJobAsync(Guid logId, string summary, CancellationToken ct = default);
         Task FailJobAsync(Guid logId, string errorMessage, CancellationToken ct = default);
+        Task<System.Collections.Generic.List<BackgroundJobLog>> GetRecentLogsAsync(int count, CancellationToken ct = default);
     }
 }

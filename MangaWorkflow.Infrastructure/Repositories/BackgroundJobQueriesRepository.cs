@@ -19,14 +19,29 @@ namespace MangaWorkflow.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<bool> HasRecentNotificationAsync(Guid userId, string notificationType, string title, TimeSpan withinTimeSpan, CancellationToken ct)
+        public async Task<bool> HasRecentNotificationAsync(Guid userId, string notificationType, string title, TimeSpan withinTimeSpan, CancellationToken ct, string? referenceType = null, Guid? referenceId = null)
         {
             var cutoff = DateTime.UtcNow.Subtract(withinTimeSpan);
-            return await _context.Notifications
-                .AnyAsync(n => n.UserId == userId 
+            var query = _context.Notifications
+                .Where(n => n.UserId == userId 
                             && n.NotificationType.TypeCode == notificationType 
-                            && n.Title == title 
-                            && n.CreatedAt >= cutoff, ct);
+                            && n.CreatedAt >= cutoff);
+
+            if (!string.IsNullOrEmpty(referenceType))
+            {
+                query = query.Where(n => n.ReferenceType == referenceType);
+            }
+
+            if (referenceId.HasValue)
+            {
+                query = query.Where(n => n.ReferenceId == referenceId.Value);
+            }
+            else
+            {
+                query = query.Where(n => n.Title == title);
+            }
+
+            return await query.AnyAsync(ct);
         }
 
         public async Task<List<Series>> GetSeriesForRankingRiskAsync(CancellationToken ct)

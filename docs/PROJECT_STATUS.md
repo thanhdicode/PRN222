@@ -153,9 +153,10 @@ PRN222: Chapter 08 Worker Service
 
 ---
 
-## Known Issues / TODOs
+## Known Issues / Demo Limitations
 
-- None. The project is fully complete and ready for demonstration.
+- **.NET Versioning**: The solution targets `.NET 10.0` (Preview) and requires the corresponding `.NET 10.0` SDK/Runtime to be installed on the demonstration machine.
+- **Authentication**: Authentication uses demo-mode plaintext password comparison for simplicity during the demonstration and is NOT suitable for production security.
 
 ---
 

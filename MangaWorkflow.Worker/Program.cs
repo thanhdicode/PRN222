@@ -7,6 +7,9 @@ var builder = Host.CreateApplicationBuilder(args);
 // Database context & Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Add a dummy IWebHostEnvironment since the Worker doesn't have one but Infrastructure's LocalFileStorageService needs it
+builder.Services.AddSingleton<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>(new MangaWorkflow.Worker.DummyWebHostEnvironment());
+
 // Services
 builder.Services.AddApplicationServices();
 

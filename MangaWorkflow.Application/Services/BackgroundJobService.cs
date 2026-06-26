@@ -40,7 +40,9 @@ namespace MangaWorkflow.Application.Services
                     "DeadlineWarning", 
                     "Task Deadline Approaching", 
                     TimeSpan.FromHours(48), 
-                    ct);
+                    ct,
+                    referenceType: "ProductionTask",
+                    referenceId: task.TaskId);
 
                 if (!alreadySent)
                 {
@@ -49,6 +51,8 @@ namespace MangaWorkflow.Application.Services
                         "DeadlineWarning",
                         "Task Deadline Approaching",
                         $"Task '{task.Title}' is due within 48 hours.",
+                        referenceType: "ProductionTask",
+                        referenceId: task.TaskId,
                         ct: ct);
                     count++;
                 }

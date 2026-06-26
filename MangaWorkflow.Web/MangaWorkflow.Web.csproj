@@ -3,7 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MangaWorkflow.Domain\MangaWorkflow.Domain.csproj" />
     <ProjectReference Include="..\MangaWorkflow.Infrastructure\MangaWorkflow.Infrastructure.csproj" />
-    <ProjectReference Include="..\MangaWorkflow.Infrastructure\MangaWorkflow.Infrastructure.csproj" />
     <ProjectReference Include="..\MangaWorkflow.Application\MangaWorkflow.Application.csproj" />
   </ItemGroup>
 

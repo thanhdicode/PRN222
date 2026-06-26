@@ -36,12 +36,40 @@ namespace MangaWorkflow.Application.Services
             }).ToList();
         }
 
+        private static readonly HashSet<string> ValidNotificationTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "TaskAssigned", "SubmissionUploaded", "SubmissionReviewed", "EditorCommentCreated",
+            "BoardVoteSubmitted", "RankingUpdated", "DeadlineWarning", "TaskOverdue", "RankingRisk", "System"
+        };
+
+        private async Task<MangaWorkflow.Domain.Entities.NotificationType> GetOrCreateTypeByCodeAsync(string typeCode, CancellationToken ct)
+        {
+            if (!ValidNotificationTypes.Contains(typeCode))
+            {
+                typeCode = "System";
+            }
+
+            var type = await _notificationRepository.GetTypeByCodeAsync(typeCode, ct);
+            if (type == null)
+            {
+                type = new MangaWorkflow.Domain.Entities.NotificationType
+                {
+                    TypeCode = typeCode,
+                    TypeName = typeCode
+                };
+                await _notificationRepository.AddTypeAsync(type, ct);
+                await _notificationRepository.SaveChangesAsync(ct);
+            }
+            return type;
+        }
+
         public async Task MarkReadAsync(Guid notificationId, Guid currentUserId, CancellationToken ct = default)
         {
             var notification = await _notificationRepository.GetByIdAsync(notificationId, ct);
             if (notification != null && notification.UserId == currentUserId && !notification.IsRead)
             {
                 notification.IsRead = true;
+                notification.ReadAt = DateTime.UtcNow;
                 await _notificationRepository.SaveChangesAsync(ct);
             }
         }
@@ -52,6 +80,7 @@ namespace MangaWorkflow.Application.Services
             foreach (var n in unread)
             {
                 n.IsRead = true;
+                n.ReadAt = DateTime.UtcNow;
             }
             if (unread.Any())
             {
@@ -61,8 +90,7 @@ namespace MangaWorkflow.Application.Services
 
         public async Task<MangaWorkflow.Application.DTOs.Notifications.NotificationDto?> CreateAndSendAsync(Guid userId, string typeCode, string title, string message, string? referenceType = null, Guid? referenceId = null, CancellationToken ct = default)
         {
-            var type = await _notificationRepository.GetTypeByCodeAsync(typeCode, ct);
-            if (type == null) return null;
+            var type = await GetOrCreateTypeByCodeAsync(typeCode, ct);
 
             var notification = new MangaWorkflow.Domain.Entities.Notification
             {

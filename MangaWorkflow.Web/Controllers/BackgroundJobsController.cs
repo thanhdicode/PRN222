@@ -12,16 +12,19 @@ namespace MangaWorkflow.Web.Controllers
     public class BackgroundJobsController : Controller
     {
         private readonly IBackgroundJobService _jobService;
+        private readonly MangaWorkflow.Application.Interfaces.Repositories.IBackgroundJobLogRepository _logRepo;
 
-        public BackgroundJobsController(IBackgroundJobService jobService)
+        public BackgroundJobsController(IBackgroundJobService jobService, MangaWorkflow.Application.Interfaces.Repositories.IBackgroundJobLogRepository logRepo)
         {
             _jobService = jobService;
+            _logRepo = logRepo;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-            return View();
+            var logs = await _logRepo.GetRecentLogsAsync(50, ct);
+            return View(logs);
         }
 
         [HttpPost("deadline-reminders")]

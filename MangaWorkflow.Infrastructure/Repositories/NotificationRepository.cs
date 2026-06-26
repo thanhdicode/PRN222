@@ -24,6 +24,11 @@ namespace MangaWorkflow.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.TypeCode == typeCode, ct);
         }
 
+        public async Task AddTypeAsync(NotificationType type, CancellationToken ct = default)
+        {
+            await _context.NotificationTypes.AddAsync(type, ct);
+        }
+
         public async Task AddAsync(Notification notification, CancellationToken ct = default)
         {
             await _context.Notifications.AddAsync(notification, ct);

@@ -1,3 +1,5 @@
+@model System.Collections.Generic.List<MangaWorkflow.Domain.Entities.BackgroundJobLog>
+
 @{
     ViewData["Title"] = "Background Jobs Admin";
 }
@@ -87,6 +89,62 @@
                             Run Now
                         </button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Background Job Logs</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Name</th>
+                                    <th>Status</th>
+                                    <th>Started At</th>
+                                    <th>Finished At</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@log.JobName</strong></td>
+                                        <td>
+                                            @if (log.Status == "Succeeded")
+                                            {
+                                                <span class="badge bg-success">@log.Status</span>
+                                            }
+                                            else if (log.Status == "Failed")
+                                            {
+                                                <span class="badge bg-danger">@log.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">@log.Status</span>
+                                            }
+                                        </td>
+                                        <td>@log.StartedAt.ToLocalTime().ToString("g")</td>
+                                        <td>@(log.FinishedAt?.ToLocalTime().ToString("g") ?? "-")</td>
+                                        <td>@log.Message</td>
+                                    </tr>
+                                }
+                                @if (Model.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">No recent job logs found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
