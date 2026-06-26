@@ -33,8 +33,10 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("MangakaOnly", policy => policy.RequireRole("Mangaka"));
-    options.AddPolicy("BoardMember", policy => policy.RequireRole("BoardMember"));
-    options.AddPolicy("AdminOrBoard", policy => policy.RequireRole("Admin", "BoardMember"));
+    options.AddPolicy("AssistantOnly", policy => policy.RequireRole("Assistant"));
+    options.AddPolicy("TantouEditorOnly", policy => policy.RequireRole("TantouEditor"));
+    options.AddPolicy("EditorialBoardOnly", policy => policy.RequireRole("EditorialBoard"));
+    options.AddPolicy("AdminOrBoard", policy => policy.RequireRole("Admin", "EditorialBoard"));
 });
 
 var app = builder.Build();

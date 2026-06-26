@@ -17,7 +17,7 @@
             </nav>
         </div>
         <div>
-            @if (User.HasClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "BoardMember"))
+            @if (User.HasClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "EditorialBoard"))
             {
                 @if (Model.CurrentMemberHasVoted)
                 {

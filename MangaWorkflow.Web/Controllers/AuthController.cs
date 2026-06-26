@@ -75,7 +75,9 @@ namespace MangaWorkflow.Web.Controllers
             {
                 "Admin" => RedirectToAction("Index", "Dashboard", new { area = "Admin" }),
                 "Mangaka" => RedirectToAction("Index", "Dashboard", new { area = "Mangaka" }),
-                "BoardMember" => RedirectToAction("Index", "Review", new { area = "Board" }),
+                "EditorialBoard" => RedirectToAction("Index", "Review", new { area = "Board" }),
+                "Assistant" => RedirectToAction("Index", "Home"),
+                "TantouEditor" => RedirectToAction("Index", "Home"),
                 _ => RedirectToAction("Index", "Home")
             };
         }

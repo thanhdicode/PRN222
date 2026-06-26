@@ -138,8 +138,6 @@ PRN222: Chapter 08 Worker Service
 
 ## Known Issues / TODOs
 
-- Program.cs Areas route registration for Admin/Mangaka/Board not yet done
-- Authentication middleware not yet added to Program.cs
 - No Blazor component routing configured yet (needed for Phase 4)
 - Worker appsettings.json connection string may need to be verified
 

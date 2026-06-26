@@ -11,6 +11,12 @@ Phase 2 of the MangaWorkflowSystem has been successfully implemented. This phase
 - **Role-based Navigation**: Updated the shared layout to show relevant navigation links based on user roles (Admin, Mangaka, EditorialBoard).
 - **Service Registration**: Registered all newly created services and repositories in DependencyInjection configurations for both Application and Infrastructure layers.
 
+## Authentication and Authorization Fix
+- Normalized role codes to `Admin`, `Mangaka`, `Assistant`, `TantouEditor`, `EditorialBoard` in `Program.cs` policies to correctly match the database seed data.
+- Replaced legacy `BoardMember` strings with `EditorialBoard` and `EditorialBoardOnly` across controllers, views (`Details.cshtml`), and configuration.
+- Corrected role-based URL redirection on login for all roles in `AuthController.cs`.
+- Replaced the hardcoded legacy privacy and home links with proper, authenticated role-based navigation dropdowns in `_Layout.cshtml`.
+
 ## Verification
 - **Build**: The solution `MangaWorkflowSystem` compiles without errors (`dotnet build`).
 - **Smoke Tests**: The `DbSmokeTest` utility successfully verifies database connections and entity tracking.

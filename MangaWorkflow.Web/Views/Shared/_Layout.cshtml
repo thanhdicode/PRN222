@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -23,9 +23,64 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Admin
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (User.IsInRole("Mangaka"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="mangakaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Mangaka
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="mangakaDropdown">
+                                        <li><a class="dropdown-item" asp-area="Mangaka" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-area="Mangaka" asp-controller="Series" asp-action="Index">My Series</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if (User.IsInRole("EditorialBoard"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="boardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Board
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="boardDropdown">
+                                        <li><a class="dropdown-item" asp-area="Board" asp-controller="Review" asp-action="Index">Series Review</a></li>
+                                        <li><a class="dropdown-item" asp-area="Board" asp-controller="Rankings" asp-action="Index">Rankings</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">Hello, @User.Identity.Name!</span>
+                            </li>
+                            <li class="nav-item">
+                                <form class="form-inline" asp-area="" asp-controller="Auth" asp-action="Logout" method="post">
+                                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

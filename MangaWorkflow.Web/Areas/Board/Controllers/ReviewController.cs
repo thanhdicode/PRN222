@@ -37,7 +37,7 @@ namespace MangaWorkflow.Web.Areas.Board.Controllers
         }
 
         // GET /Board/Review/Vote/{id}
-        [Authorize(Policy = "BoardMember")]
+        [Authorize(Policy = "EditorialBoardOnly")]
         public async Task<IActionResult> Vote(Guid id, CancellationToken ct)
         {
             var memberId = GetCurrentUserId();
@@ -57,7 +57,7 @@ namespace MangaWorkflow.Web.Areas.Board.Controllers
         // POST /Board/Review/Vote/{id}
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Policy = "BoardMember")]
+        [Authorize(Policy = "EditorialBoardOnly")]
         public async Task<IActionResult> Vote(Guid id, SubmitVoteDto dto, CancellationToken ct)
         {
             if (id != dto.SeriesId) return BadRequest();
