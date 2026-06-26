@@ -20,6 +20,7 @@ namespace MangaWorkflow.Application
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IBoardReviewService, BoardReviewService>();
             services.AddScoped<IRankingService, RankingService>();
+            services.AddScoped<IBackgroundJobService, BackgroundJobService>();
 
             // Phase 3 services
             services.AddScoped<ITaskWorkflowService, TaskWorkflowService>();

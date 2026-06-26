@@ -84,6 +84,38 @@ namespace MangaWorkflow.Application.Services
             };
             return Task.FromResult(list);
         }
+
+        public async Task<List<TaskDeadlineReminderDto>> GetTasksDueWithinHoursAsync(int hours, CancellationToken ct = default)
+        {
+            var tasks = await _taskRepo.GetTasksDueWithinHoursAsync(hours, ct);
+            return tasks.Select(t => new TaskDeadlineReminderDto
+            {
+                TaskId = t.TaskId,
+                Title = t.Title,
+                AssignedToUserId = t.AssignedToAssistantId,
+                Deadline = t.Deadline.Value
+            }).ToList();
+        }
+
+        public async Task<List<TaskOverdueDto>> GetOverdueTasksAsync(CancellationToken ct = default)
+        {
+            var tasks = await _taskRepo.GetOverdueTasksAsync(ct);
+            return tasks.Select(t => new TaskOverdueDto
+            {
+                TaskId = t.TaskId,
+                Title = t.Title,
+                AssignedToUserId = t.AssignedToAssistantId,
+                MangakaId = t.Page?.Chapter?.Series?.MangakaId ?? Guid.Empty
+            }).ToList();
+        }
+
+        public async Task MarkTasksAsOverdueAsync(List<Guid> taskIds, CancellationToken ct = default)
+        {
+            if (taskIds.Any())
+            {
+                await _taskRepo.MarkTasksAsOverdueAsync(taskIds, ct);
+            }
+        }
     }
 }
 

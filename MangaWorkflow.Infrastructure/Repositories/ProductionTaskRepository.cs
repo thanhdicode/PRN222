@@ -77,6 +77,60 @@ namespace MangaWorkflow.Infrastructure.Repositories
             _context.ProductionTasks.Add(task);
             await _context.SaveChangesAsync(ct);
         }
+
+        public async Task<List<ProductionTask>> GetTasksDueWithinHoursAsync(int hours, CancellationToken ct = default)
+        {
+            var cutoff = DateTime.UtcNow.AddHours(hours);
+            return await _context.ProductionTasks
+                .Include(t => t.TaskStatus)
+                .Where(t => t.Deadline <= cutoff && 
+                            t.TaskStatus.StatusCode != "Approved" && 
+                            t.TaskStatus.StatusCode != "Cancelled")
+                .ToListAsync(ct);
+        }
+
+        public async Task<List<ProductionTask>> GetOverdueTasksAsync(CancellationToken ct = default)
+        {
+            var now = DateTime.UtcNow;
+            var excludedStatuses = new[] { "Approved", "Rejected", "Cancelled", "Overdue" };
+            
+            return await _context.ProductionTasks
+                .Include(t => t.TaskStatus)
+                .Include(t => t.Page).ThenInclude(p => p.Chapter).ThenInclude(c => c.Series)
+                .Where(t => t.Deadline < now && !excludedStatuses.Contains(t.TaskStatus.StatusCode))
+                .ToListAsync(ct);
+        }
+
+        public async Task MarkTasksAsOverdueAsync(List<Guid> taskIds, CancellationToken ct = default)
+        {
+            var overdueStatus = await _context.TaskStatuses.FirstOrDefaultAsync(s => s.StatusCode == "Overdue", ct);
+            if (overdueStatus == null) return;
+
+            var tasks = await _context.ProductionTasks
+                .Where(t => taskIds.Contains(t.TaskId))
+                .ToListAsync(ct);
+
+            foreach (var task in tasks)
+            {
+                task.TaskStatusId = overdueStatus.TaskStatusId;
+                task.UpdatedAt = DateTime.UtcNow;
+                
+                // Add to WorkflowStatusHistory if exists in DB Context
+                _context.WorkflowStatusHistories.Add(new WorkflowStatusHistory
+                {
+                    WorkflowHistoryId = Guid.NewGuid(),
+                    EntityName = "ProductionTask",
+                    EntityId = task.TaskId,
+                    FromStatusCode = null, // Or try to get current if tracked
+                    ToStatusCode = overdueStatus.StatusCode,
+                    ChangedByUserId = null,
+                    ChangedAt = DateTime.UtcNow,
+                    Note = "Automatically marked as Overdue by system worker."
+                });
+            }
+
+            await _context.SaveChangesAsync(ct);
+        }
     }
 }
 

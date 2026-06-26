@@ -15,11 +15,13 @@ namespace MangaWorkflow.Infrastructure
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             // Phase 1 repositories
-            services.AddScoped<ISeriesRepository, SeriesRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IBackgroundJobLogRepository, BackgroundJobLogRepository>();
+            services.AddScoped<IBackgroundJobQueriesRepository, BackgroundJobQueriesRepository>();
             services.AddScoped<IChapterRepository, ChapterRepository>();
             services.AddScoped<IProductionTaskRepository, ProductionTaskRepository>();
             services.AddScoped<INotificationRepository, NotificationRepository>();
+            services.AddScoped<ISeriesRepository, SeriesRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             // Phase 2 repositories
             services.AddScoped<IPageRepository, PageRepository>();

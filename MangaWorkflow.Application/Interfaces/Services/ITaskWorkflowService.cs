@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,5 +12,10 @@ namespace MangaWorkflow.Application.Interfaces.Services
         Task<TaskDetailDto?> GetTaskDetailAsync(Guid taskId, CancellationToken ct = default);
         Task StartTaskAsync(Guid taskId, Guid assistantId, CancellationToken ct = default);
         Task<List<TaskStatusOption>> GetTaskStatusOptionsAsync(CancellationToken ct = default);
+        
+        // Worker methods
+        Task<List<TaskDeadlineReminderDto>> GetTasksDueWithinHoursAsync(int hours, CancellationToken ct = default);
+        Task<List<TaskOverdueDto>> GetOverdueTasksAsync(CancellationToken ct = default);
+        Task MarkTasksAsOverdueAsync(List<Guid> taskIds, CancellationToken ct = default);
     }
 }

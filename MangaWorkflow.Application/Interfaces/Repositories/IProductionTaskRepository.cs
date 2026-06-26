@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,5 +14,9 @@ namespace MangaWorkflow.Application.Interfaces.Repositories
         Task UpdateStatusAsync(Guid taskId, string statusCode, CancellationToken ct = default);
         Task<ProductionTask?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task AddAsync(ProductionTask task, CancellationToken ct = default);
+        
+        Task<List<ProductionTask>> GetTasksDueWithinHoursAsync(int hours, CancellationToken ct = default);
+        Task<List<ProductionTask>> GetOverdueTasksAsync(CancellationToken ct = default);
+        Task MarkTasksAsOverdueAsync(List<Guid> taskIds, CancellationToken ct = default);
     }
 }

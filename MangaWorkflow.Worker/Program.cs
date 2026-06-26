@@ -10,7 +10,11 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Services
 builder.Services.AddApplicationServices();
 
-// builder.Services.AddHostedService<OverdueTaskScannerWorker>(); // To be implemented
-
+// Register Hosted Services
+builder.Services.AddHostedService<MangaWorkflow.Worker.DeadlineReminderWorker>();
+builder.Services.AddHostedService<MangaWorkflow.Worker.OverdueTaskScannerWorker>();
+builder.Services.AddHostedService<MangaWorkflow.Worker.RankingRiskWorker>();
+builder.Services.AddHostedService<MangaWorkflow.Worker.NotificationCleanupWorker>();
+builder.Services.AddHostedService<MangaWorkflow.Worker.MonthlyEarningCalculatorWorker>();
 var host = builder.Build();
 host.Run();

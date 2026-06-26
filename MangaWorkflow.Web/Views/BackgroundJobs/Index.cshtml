@@ -1,0 +1,94 @@
+@{
+    ViewData["Title"] = "Background Jobs Admin";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Background Jobs Administration</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Deadline Reminders -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning"><i class="bi bi-clock-history me-2"></i>Deadline Reminders</h5>
+                    <p class="card-text text-muted">Finds tasks due within 48 hours and sends a warning notification to the assignee if not already sent recently.</p>
+                    <form asp-action="RunDeadlineReminders" method="post">
+                        <button type="submit" class="btn btn-outline-warning w-100">
+                            Run Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overdue Task Scanner -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-danger">
+                <div class="card-body">
+                    <h5 class="card-title text-danger"><i class="bi bi-exclamation-octagon me-2"></i>Overdue Task Scanner</h5>
+                    <p class="card-text text-muted">Finds tasks that are past their deadline but not yet approved. Marks them as 'Overdue' and notifies Assistant & Mangaka.</p>
+                    <form asp-action="RunOverdueTasks" method="post">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            Run Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranking Risks -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-info">
+                <div class="card-body">
+                    <h5 class="card-title text-info"><i class="bi bi-graph-down-arrow me-2"></i>Ranking Risk Evaluator</h5>
+                    <p class="card-text text-muted">Checks series with recent ranking drops. Increases Cancellation Risk Score and alerts the Mangaka.</p>
+                    <form asp-action="RunRankingRisks" method="post">
+                        <button type="submit" class="btn btn-outline-info w-100">
+                            Run Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Cleanup -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-secondary">
+                <div class="card-body">
+                    <h5 class="card-title text-secondary"><i class="bi bi-trash3 me-2"></i>Notification Cleanup</h5>
+                    <p class="card-text text-muted">Removes old 'Read' notifications that are older than 30 days to save database space.</p>
+                    <form asp-action="RunNotificationCleanup" method="post">
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            Run Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Earnings -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success"><i class="bi bi-cash-coin me-2"></i>Monthly Earnings</h5>
+                    <p class="card-text text-muted">Scans for Approved tasks without Earning records and generates new Pending Earnings for assistants.</p>
+                    <form asp-action="RunMonthlyEarnings" method="post">
+                        <button type="submit" class="btn btn-outline-success w-100">
+                            Run Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
