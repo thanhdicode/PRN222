@@ -56,7 +56,12 @@ namespace MangaWorkflow.Infrastructure.Repositories
             var task = await _context.ProductionTasks.FindAsync(new object[] { taskId }, ct);
             if (task != null)
             {
-                task.TaskStatus.StatusCode = statusCode;
+                var status = await _context.TaskStatuses
+                    .FirstOrDefaultAsync(s => s.StatusCode == statusCode, ct);
+                if (status == null)
+                    throw new InvalidOperationException($"TaskStatus '{statusCode}' not found.");
+
+                task.TaskStatusId = status.TaskStatusId;
                 task.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync(ct);
             }

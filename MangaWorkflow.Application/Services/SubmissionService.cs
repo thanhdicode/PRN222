@@ -15,12 +15,21 @@ namespace MangaWorkflow.Application.Services
         private readonly ITaskSubmissionRepository _submissionRepo;
         private readonly IProductionTaskRepository _taskRepo;
         private readonly INotificationRepository _notificationRepo;
+        private readonly ISubmissionStatusRepository _submissionStatusRepo;
+        private readonly INotificationTypeRepository _notificationTypeRepo;
 
-        public SubmissionService(ITaskSubmissionRepository submissionRepo, IProductionTaskRepository taskRepo, INotificationRepository notificationRepo)
+        public SubmissionService(
+            ITaskSubmissionRepository submissionRepo,
+            IProductionTaskRepository taskRepo,
+            INotificationRepository notificationRepo,
+            ISubmissionStatusRepository submissionStatusRepo,
+            INotificationTypeRepository notificationTypeRepo)
         {
             _submissionRepo = submissionRepo;
             _taskRepo = taskRepo;
             _notificationRepo = notificationRepo;
+            _submissionStatusRepo = submissionStatusRepo;
+            _notificationTypeRepo = notificationTypeRepo;
         }
 
         public async Task SubmitTaskAsync(SubmitTaskDto dto, Guid assistantId, CancellationToken ct = default)
@@ -28,36 +37,53 @@ namespace MangaWorkflow.Application.Services
             var task = await _taskRepo.GetWithDetailsAsync(dto.TaskId, ct);
             if (task == null || task.AssignedToAssistantId != assistantId) return;
 
+            // Resolve SubmissionStatus by StatusCode — never hardcode IDs
+            var submittedStatusId = await _submissionStatusRepo.GetIdByCodeAsync("Submitted", ct);
+
             var submission = new TaskSubmission
             {
                 SubmissionId = Guid.NewGuid(),
                 TaskId = dto.TaskId,
                 SubmittedByAssistantId = assistantId,
-                FileUrl = dto.FileUrl,
+                FileUrl = dto.FileUrl ?? string.Empty,
                 Comment = dto.Notes,
-                SubmissionStatusId = 1,
+                SubmissionStatusId = submittedStatusId,
                 SubmittedAt = DateTime.UtcNow
             };
 
             await _submissionRepo.AddAsync(submission, ct);
             await _taskRepo.UpdateStatusAsync(dto.TaskId, "Submitted", ct);
 
-            // Optional Notification
-            var mangakaId = task.Page?.Chapter?.Series?.SeriesTeamMembers.FirstOrDefault(tm => tm.RoleInSeries == "Mangaka")?.UserId;
+            // Notify Mangaka: prefer Series.MangakaId, fallback to SeriesTeamMembers role
+            var series = task.Page?.Chapter?.Series;
+            Guid? mangakaId = null;
+            if (series != null)
+            {
+                if (series.MangakaId != Guid.Empty)
+                    mangakaId = series.MangakaId;
+                else
+                    mangakaId = series.SeriesTeamMembers
+                        .FirstOrDefault(tm => tm.RoleInSeries.Contains("Mangaka"))?.UserId;
+            }
+
             if (mangakaId.HasValue)
             {
-                await _notificationRepo.AddAsync(new Notification
+                var notifTypeId = await _notificationTypeRepo.GetIdByCodeAsync("SubmissionUploaded", ct);
+                if (notifTypeId.HasValue)
                 {
-                    NotificationId = Guid.NewGuid(),
-                    UserId = mangakaId.Value,
-                    NotificationTypeId = 1,
-                    Title = "New Submission",
-                    Message = $"Task {task.Title} was submitted.",
-                    ReferenceType = "TaskSubmission",
-                    ReferenceId = submission.SubmissionId,
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow
-                }, ct);
+                    await _notificationRepo.AddAsync(new Notification
+                    {
+                        NotificationId = Guid.NewGuid(),
+                        UserId = mangakaId.Value,
+                        NotificationTypeId = notifTypeId.Value,
+                        Title = "New Submission",
+                        Message = $"Task \"{task.Title}\" was submitted by an assistant.",
+                        ReferenceType = "TaskSubmission",
+                        ReferenceId = submission.SubmissionId,
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    }, ct);
+                }
             }
         }
 
@@ -89,7 +115,7 @@ namespace MangaWorkflow.Application.Services
                 SubmittedAt = submission.SubmittedAt,
                 FileUrl = submission.FileUrl,
                 Notes = submission.Comment,
-                StatusCode = submission.SubmissionStatus.StatusCode
+                StatusCode = submission.SubmissionStatus?.StatusCode ?? ""
             };
         }
 
@@ -98,38 +124,48 @@ namespace MangaWorkflow.Application.Services
             var submission = await _submissionRepo.GetWithTaskAsync(dto.SubmissionId, ct);
             if (submission == null) return;
 
-            submission.SubmissionStatus.StatusCode = dto.Decision == "Approved" ? "Approved" : 
-                                    dto.Decision == "Rejected" ? "Rejected" : "RevisionRequired";
+            // Map decision → StatusCode
+            string newStatusCode = dto.Decision switch
+            {
+                "Approved" => "Approved",
+                "Rejected" => "Rejected",
+                _ => "RevisionRequired"
+            };
+
+            // Resolve SubmissionStatus by StatusCode — never mutate navigation property
+            var newStatusId = await _submissionStatusRepo.GetIdByCodeAsync(newStatusCode, ct);
+            submission.SubmissionStatusId = newStatusId;
             submission.ReviewedAt = DateTime.UtcNow;
             submission.ReviewedByMangakaId = mangakaId;
             submission.ReviewNote = dto.Reason;
 
             await _submissionRepo.UpdateAsync(submission, ct);
 
-            string taskStatus = dto.Decision == "Approved" ? "Approved" :
-                                dto.Decision == "Rejected" ? "Rejected" : "RevisionRequired";
-            
-            await _taskRepo.UpdateStatusAsync(submission.TaskId, taskStatus, ct);
-
-            // Notify Assistant
-            await _notificationRepo.AddAsync(new Notification
+            string taskStatusCode = dto.Decision switch
             {
-                NotificationId = Guid.NewGuid(),
-                UserId = submission.SubmittedByAssistantId,
-                NotificationTypeId = 1,
-                Title = "Submission Reviewed",
-                Message = $"Review completed. Decision: {dto.Decision}",
-                ReferenceType = "TaskSubmission",
-                ReferenceId = submission.SubmissionId,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            }, ct);
+                "Approved" => "Approved",
+                "Rejected" => "Rejected",
+                _ => "RevisionRequired"
+            };
+            await _taskRepo.UpdateStatusAsync(submission.TaskId, taskStatusCode, ct);
+
+            // Notify assistant about the review outcome
+            var notifTypeId = await _notificationTypeRepo.GetIdByCodeAsync("SubmissionReviewed", ct);
+            if (notifTypeId.HasValue)
+            {
+                await _notificationRepo.AddAsync(new Notification
+                {
+                    NotificationId = Guid.NewGuid(),
+                    UserId = submission.SubmittedByAssistantId,
+                    NotificationTypeId = notifTypeId.Value,
+                    Title = "Submission Reviewed",
+                    Message = $"Review completed. Decision: {dto.Decision}",
+                    ReferenceType = "TaskSubmission",
+                    ReferenceId = submission.SubmissionId,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                }, ct);
+            }
         }
     }
 }
-
-
-
-
-
-

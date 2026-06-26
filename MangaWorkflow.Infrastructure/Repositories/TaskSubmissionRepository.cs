@@ -33,8 +33,11 @@ namespace MangaWorkflow.Infrastructure.Repositories
                         .ThenInclude(p => p.Chapter)
                             .ThenInclude(c => c.Series)
                                 .ThenInclude(s => s.SeriesTeamMembers)
-                .Where(s => s.SubmissionStatus.StatusCode == "PendingReview" && 
-                            s.Task.Page.Chapter.Series.SeriesTeamMembers.Any(tm => tm.UserId == mangakaId && tm.RoleInSeries == "Mangaka"))
+                .Include(s => s.SubmissionStatus)
+                .Where(s => s.SubmissionStatus.StatusCode == "Submitted" &&
+                            (s.Task.Page.Chapter.Series.MangakaId == mangakaId ||
+                             s.Task.Page.Chapter.Series.SeriesTeamMembers
+                                 .Any(tm => tm.UserId == mangakaId && tm.RoleInSeries.Contains("Mangaka"))))
                 .OrderByDescending(s => s.SubmittedAt)
                 .ToListAsync(ct);
         }

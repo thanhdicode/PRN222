@@ -1,9 +1,9 @@
 # PRN222 MangaWorkflowSystem — Project Status
 
-## Current Phase: Phase 2 — ASP.NET Core MVC CRUD (NEXT)
+## Current Phase: Phase 3 — Stabilization Fixes (PENDING MANUAL VERIFICATION → then Phase 4)
 
 **Last Updated**: 2026-06-26
-**Build Status**: ✅ Phase 1 Complete — Build Passes, DbSmokeTest Passes
+**Build Status**: ✅ Phase 3 Stabilization Build Passes, DbSmokeTest Passes
 
 ---
 
@@ -14,8 +14,8 @@
 | Phase 0 | Database Ready | ✅ DONE | — |
 | Phase 1 | Foundation, Scaffold, DI | ✅ DONE | Ch01-Ch03 |
 | Phase 2 | ASP.NET Core MVC CRUD | ✅ DONE | Ch04 |
-| Phase 3 | Razor Pages Workflow | ⏳ NEXT | Ch05 |
-| Phase 4 | Blazor + SignalR | 🔒 Locked | Ch06, Ch07 |
+| Phase 3 | Razor Pages Workflow | ✅ DONE (pending manual verify) | Ch05 |
+| Phase 4 | Blazor + SignalR | ⏳ NEXT (after manual verify) | Ch06, Ch07 |
 | Phase 5 | Worker + Final Demo | 🔒 Locked | Ch08 |
 
 ---
@@ -89,23 +89,38 @@ See prompts/PHASE_2_IMPLEMENTATION_PROMPT.md
 
 ---
 
-## ⏳ Phase 3 — Razor Pages Workflow (NEXT)
+## ✅ Phase 3 — Razor Pages Workflow (DONE — Pending Manual Verification)
 
-Status: NOT STARTED
+Status: BUILD PASSES, STABILIZATION FIXES APPLIED
 PRN222: Chapter 05 Razor Pages
 
 ### Target deliverables
-- [ ] Pages/Assistant/TaskInbox
-- [ ] Pages/Assistant/TaskDetail
-- [ ] Pages/Assistant/SubmitTask (file upload)
-- [ ] Pages/Mangaka/ReviewSubmissions
-- [ ] Pages/Mangaka/ReviewSubmissionDetail (approve/reject/revision)
-- [ ] Pages/Mangaka/PageRegions (add regions, create tasks)
-- [ ] Pages/Editor/PageComments (add/resolve)
+- [x] Pages/Assistant/TaskInbox
+- [x] Pages/Assistant/TaskDetail
+- [x] Pages/Assistant/SubmitTask (file upload)
+- [x] Pages/Mangaka/ReviewSubmissions
+- [x] Pages/Mangaka/ReviewSubmissionDetail (approve/reject/revision)
+- [x] Pages/Mangaka/PageRegions (add regions, create tasks)
+- [x] Pages/Editor/PageComments (add/resolve)
+
+### Stabilization Fixes Applied (2026-06-26)
+- [x] Fix 1: SubmissionStatus filter changed from wrong "PendingReview" → correct "Submitted"
+- [x] Fix 2: Hardcoded SubmissionStatusId=1 replaced with DB lookup via ISubmissionStatusRepository
+- [x] Fix 3: ProductionTaskRepository.UpdateStatusAsync — query TaskStatuses by StatusCode, set TaskStatusId FK
+- [x] Fix 4: ReviewSubmissionAsync — query SubmissionStatuses by StatusCode, set SubmissionStatusId FK (no nav property mutation)
+- [x] Fix 5: NotificationTypeId hardcoding replaced with INotificationTypeRepository lookup by TypeCode
+- [x] Fix 6: Mangaka lookup — prefer Series.MangakaId; fallback to SeriesTeamMembers RoleInSeries.Contains("Mangaka")
+- [x] Fix 7: PageComments authorization — removed invalid "Editor" role, now uses TantouEditor,Admin,EditorialBoard
+- [x] Fix 8: Removed unused IPageRepository injection from PageRegionsModel
+
+### Completion gate (PASSES)
+- ✅ dotnet build — 0 errors
+- ✅ dotnet run DbSmokeTest — passes
+- ⏳ Manual workflow verification required before Phase 4 unlocks
 
 ---
 
-## 🔒 Phase 4 — Blazor + SignalR (LOCKED)
+## ⏳ Phase 4 — Blazor + SignalR (NEXT after manual verify)
 
 Locked until Phase 3 is DONE.
 PRN222: Chapter 06 Blazor + Chapter 07 SignalR

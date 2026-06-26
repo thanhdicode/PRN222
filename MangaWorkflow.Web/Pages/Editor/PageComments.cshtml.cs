@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ using MangaWorkflow.Application.Interfaces.Services;
 
 namespace MangaWorkflow.Web.Pages.Editor
 {
-    [Authorize(Roles = "Editor,Admin,EditorialBoard,TantouEditor")]
+    [Authorize(Roles = "TantouEditor,Admin,EditorialBoard")]
     public class PageCommentsModel : PageModel
     {
         private readonly IEditorCommentService _commentService;

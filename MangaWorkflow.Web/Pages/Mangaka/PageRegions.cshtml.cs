@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MangaWorkflow.Application.DTOs.Regions;
 using MangaWorkflow.Application.Interfaces.Services;
-using MangaWorkflow.Application.Interfaces.Repositories;
 
 namespace MangaWorkflow.Web.Pages.Mangaka
 {
@@ -15,12 +14,10 @@ namespace MangaWorkflow.Web.Pages.Mangaka
     public class PageRegionsModel : PageModel
     {
         private readonly IPageRegionService _regionService;
-        private readonly IPageRepository _pageRepo; // Assuming from Phase 2
 
-        public PageRegionsModel(IPageRegionService regionService, IPageRepository pageRepo)
+        public PageRegionsModel(IPageRegionService regionService)
         {
             _regionService = regionService;
-            _pageRepo = pageRepo;
         }
 
         [BindProperty(SupportsGet = true)]

@@ -32,6 +32,10 @@ namespace MangaWorkflow.Infrastructure
             services.AddScoped<IPageRegionRepository, PageRegionRepository>();
             services.AddScoped<MangaWorkflow.Application.Interfaces.Services.IFileStorageService, MangaWorkflow.Infrastructure.FileStorage.LocalFileStorageService>();
 
+            // Phase 3 stabilization — lookup repos (no hardcoded IDs)
+            services.AddScoped<ISubmissionStatusRepository, SubmissionStatusRepository>();
+            services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+
             return services;
         }
     }
