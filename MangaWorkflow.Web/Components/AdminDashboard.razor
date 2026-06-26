@@ -1,0 +1,47 @@
+@using MangaWorkflow.Application.DTOs.Dashboard
+@using MangaWorkflow.Application.Interfaces.Services
+@inject IDashboardService DashboardService
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
+    <div class="col">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <h2 class="mb-0">@Model?.TotalUsers</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total Series</h5>
+                <h2 class="mb-0">@Model?.TotalSeries</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <h5 class="card-title">Active Tasks</h5>
+                <h2 class="mb-0">@Model?.ActiveTasks</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Pending Submissions</h5>
+                <h2 class="mb-0">@Model?.PendingSubmissions</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private AdminDashboardDto? Model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await DashboardService.GetAdminDashboardAsync();
+    }
+}

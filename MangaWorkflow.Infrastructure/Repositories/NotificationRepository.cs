@@ -29,6 +29,27 @@ namespace MangaWorkflow.Infrastructure.Repositories
             await _context.Notifications.AddAsync(notification, ct);
         }
 
+        public async Task<List<Notification>> GetUnreadAsync(Guid userId, CancellationToken ct = default)
+        {
+            return await _context.Notifications
+                .Include(n => n.NotificationType)
+                .Where(n => n.UserId == userId && !n.IsRead)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync(ct);
+        }
+
+        public async Task<Notification?> GetByIdAsync(Guid notificationId, CancellationToken ct = default)
+        {
+            return await _context.Notifications.FindAsync(new object[] { notificationId }, ct);
+        }
+
+        public async Task<List<Notification>> GetAllUnreadAsync(Guid userId, CancellationToken ct = default)
+        {
+            return await _context.Notifications
+                .Where(n => n.UserId == userId && !n.IsRead)
+                .ToListAsync(ct);
+        }
+
         public async Task SaveChangesAsync(CancellationToken ct = default)
         {
             await _context.SaveChangesAsync(ct);

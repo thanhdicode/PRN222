@@ -15,14 +15,14 @@ namespace MangaWorkflow.Application.Services
         private readonly IPageRegionRepository _regionRepo;
         private readonly IProductionTaskRepository _taskRepo;
         private readonly IUserRepository _userRepo;
-        private readonly INotificationRepository _notificationRepo;
+        private readonly INotificationService _notificationService;
 
-        public PageRegionService(IPageRegionRepository regionRepo, IProductionTaskRepository taskRepo, IUserRepository userRepo, INotificationRepository notificationRepo)
+        public PageRegionService(IPageRegionRepository regionRepo, IProductionTaskRepository taskRepo, IUserRepository userRepo, INotificationService notificationService)
         {
             _regionRepo = regionRepo;
             _taskRepo = taskRepo;
             _userRepo = userRepo;
-            _notificationRepo = notificationRepo;
+            _notificationService = notificationService;
         }
 
         public async Task<List<RegionListItemDto>> GetRegionsForPageAsync(Guid pageId, CancellationToken ct = default)
@@ -71,18 +71,15 @@ namespace MangaWorkflow.Application.Services
 
             if (dto.AssignedToUserId.HasValue)
             {
-                await _notificationRepo.AddAsync(new Notification
-                {
-                    NotificationId = Guid.NewGuid(),
-                    UserId = dto.AssignedToUserId.Value,
-                    NotificationTypeId = 1,
-                    Title = "New Task Assigned",
-                    Message = $"You have been assigned a new task: {task.Title}",
-                    CreatedAt = DateTime.UtcNow,
-                    IsRead = false,
-                    ReferenceId = task.TaskId,
-                    ReferenceType = "ProductionTask"
-                }, ct);
+                await _notificationService.CreateAndSendAsync(
+                    dto.AssignedToUserId.Value,
+                    "NewTaskAssigned", // assumed type code, originally hardcoded to 1
+                    "New Task Assigned",
+                    $"You have been assigned a new task: {task.Title}",
+                    "ProductionTask",
+                    task.TaskId,
+                    ct
+                );
             }
 
             return task.TaskId;

@@ -1,0 +1,34 @@
+@using MangaWorkflow.Application.DTOs.Dashboard
+@using MangaWorkflow.Application.Interfaces.Services
+@inject IDashboardService DashboardService
+
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+    <div class="col">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Assigned Series</h5>
+                <h2 class="mb-0">@Model?.AssignedSeriesCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <h5 class="card-title">Unresolved Comments</h5>
+                <h2 class="mb-0">@Model?.UnresolvedCommentsCount</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private EditorDashboardDto? Model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await DashboardService.GetEditorDashboardAsync(UserId);
+    }
+}

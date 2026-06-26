@@ -11,6 +11,12 @@ public class HomeController : Controller
         return View();
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    public IActionResult Dashboard()
+    {
+        return View();
+    }
+
     public IActionResult Privacy()
     {
         return View();

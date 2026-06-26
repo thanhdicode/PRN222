@@ -36,6 +36,9 @@ namespace MangaWorkflow.Infrastructure
             services.AddScoped<ISubmissionStatusRepository, SubmissionStatusRepository>();
             services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
 
+            // Phase 4 repositories
+            services.AddScoped<IDashboardRepository, DashboardRepository>();
+
             return services;
         }
     }

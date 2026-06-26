@@ -15,6 +15,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Application Services
 builder.Services.AddApplicationServices();
 
+// Phase 4 - Override Application's NoOp notifier with real SignalR implementation
+builder.Services.AddSingleton<MangaWorkflow.Application.Interfaces.Services.IWorkflowHubNotifier, MangaWorkflow.Web.Realtime.SignalRWorkflowHubNotifier>();
+
 // --- Cookie Authentication (Phase 2) ---
 builder.Services.AddAuthentication("MangaWorkflowCookie")
     .AddCookie("MangaWorkflowCookie", options =>
@@ -66,7 +69,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-// app.MapHub<NotificationHub>("/hubs/notifications"); // Phase 4 SignalR
+app.MapBlazorHub();
+app.MapHub<MangaWorkflow.Web.Hubs.NotificationHub>("/hubs/notifications");
+app.MapHub<MangaWorkflow.Web.Hubs.WorkflowHub>("/hubs/workflow");
 
 app.Run();
 

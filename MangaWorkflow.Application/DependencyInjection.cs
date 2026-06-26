@@ -27,6 +27,9 @@ namespace MangaWorkflow.Application
             services.AddScoped<IEditorCommentService, EditorCommentService>();
             services.AddScoped<IPageRegionService, PageRegionService>();
 
+            // Phase 4 services
+            services.AddSingleton<IWorkflowHubNotifier, MangaWorkflow.Application.Implementations.NoOpWorkflowHubNotifier>();
+
             return services;
         }
     }

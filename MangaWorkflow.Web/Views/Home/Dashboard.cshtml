@@ -1,0 +1,51 @@
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Welcome, @User.Identity?.Name</h2>
+    </div>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <component type="typeof(MangaWorkflow.Web.Components.AdminDashboard)" render-mode="ServerPrerendered" />
+    }
+    else if (User.IsInRole("Mangaka"))
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdStr, out var userId))
+        {
+            <component type="typeof(MangaWorkflow.Web.Components.MangakaDashboard)" render-mode="ServerPrerendered" param-UserId="userId" />
+        }
+    }
+    else if (User.IsInRole("Assistant"))
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdStr, out var userId))
+        {
+            <component type="typeof(MangaWorkflow.Web.Components.AssistantDashboard)" render-mode="ServerPrerendered" param-UserId="userId" />
+        }
+    }
+    else if (User.IsInRole("TantouEditor"))
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdStr, out var userId))
+        {
+            <component type="typeof(MangaWorkflow.Web.Components.EditorDashboard)" render-mode="ServerPrerendered" param-UserId="userId" />
+        }
+    }
+    else if (User.IsInRole("EditorialBoard"))
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (Guid.TryParse(userIdStr, out var userId))
+        {
+            <component type="typeof(MangaWorkflow.Web.Components.BoardDashboard)" render-mode="ServerPrerendered" param-UserId="userId" />
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="_framework/blazor.server.js"></script>
+}

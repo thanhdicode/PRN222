@@ -10,16 +10,16 @@ namespace MangaWorkflow.Application.Services
     {
         private readonly IRankingRepository _rankingRepository;
         private readonly ISeriesRepository _seriesRepository;
-        private readonly INotificationRepository _notificationRepository;
+        private readonly INotificationService _notificationService;
 
         public RankingService(
             IRankingRepository rankingRepository,
             ISeriesRepository seriesRepository,
-            INotificationRepository notificationRepository)
+            INotificationService notificationService)
         {
             _rankingRepository = rankingRepository;
             _seriesRepository = seriesRepository;
-            _notificationRepository = notificationRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<List<RankingListItemDto>> GetRankingsByIssueAsync(string issueNumber, CancellationToken ct = default)
@@ -95,24 +95,15 @@ namespace MangaWorkflow.Application.Services
             var series = await _seriesRepository.GetByIdWithDetailsAsync(seriesId, ct);
             if (series == null) return;
 
-            var notificationType = await _notificationRepository.GetTypeByCodeAsync(NotificationTypeCodes.RankingUpdated, ct);
-            if (notificationType == null) return;
-
-            var notification = new Notification
-            {
-                NotificationId = Guid.NewGuid(),
-                UserId = series.MangakaId,
-                NotificationTypeId = notificationType.NotificationTypeId,
-                Title = "Ranking Updated",
-                Message = $"Your series '{series.Title}' is ranked #{rankPosition} in Issue {issueNumber}.",
-                ReferenceType = "Series",
-                ReferenceId = seriesId,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _notificationRepository.AddAsync(notification, ct);
-            await _notificationRepository.SaveChangesAsync(ct);
+            await _notificationService.CreateAndSendAsync(
+                series.MangakaId,
+                NotificationTypeCodes.RankingUpdated,
+                "Ranking Updated",
+                $"Your series '{series.Title}' is ranked #{rankPosition} in Issue {issueNumber}.",
+                "Series",
+                seriesId,
+                ct
+            );
         }
 
         private static string GetTrendDisplay(string trend) => trend switch

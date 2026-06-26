@@ -13,13 +13,15 @@ namespace MangaWorkflow.Application.Services
     public class EditorCommentService : IEditorCommentService
     {
         private readonly IEditorCommentRepository _commentRepo;
-        private readonly INotificationRepository _notificationRepo;
+        private readonly INotificationService _notificationService;
         // In real app we might need IPageRepository to find Mangaka to notify, mocking that for now
+        private readonly IPageRepository _pageRepo;
 
-        public EditorCommentService(IEditorCommentRepository commentRepo, INotificationRepository notificationRepo)
+        public EditorCommentService(IEditorCommentRepository commentRepo, INotificationService notificationService, IPageRepository pageRepo)
         {
             _commentRepo = commentRepo;
-            _notificationRepo = notificationRepo;
+            _notificationService = notificationService;
+            _pageRepo = pageRepo;
         }
 
         public async Task<List<CommentListItemDto>> GetCommentsForPageAsync(Guid pageId, string? statusFilter, CancellationToken ct = default)
@@ -61,8 +63,20 @@ namespace MangaWorkflow.Application.Services
             var comment = new EditorComment { CommentId = Guid.NewGuid(), PageId = dto.PageId, EditorId = editorId, X = dto.RegionX, Y = dto.RegionY, CommentText = dto.CommentText, CommentStatusId = 1, CreatedAt = DateTime.UtcNow };
 
             await _commentRepo.AddAsync(comment, ct);
-            
             // Notification would normally go to Mangaka here
+            var page = await _pageRepo.GetByIdWithDetailsAsync(dto.PageId, ct);
+            if (page != null && page.Chapter?.Series != null)
+            {
+                await _notificationService.CreateAndSendAsync(
+                    page.Chapter.Series.MangakaId,
+                    "EditorCommentAdded",
+                    "New Editor Comment",
+                    $"An editor has added a comment to your page.",
+                    "Page",
+                    dto.PageId,
+                    ct
+                );
+            }
         }
 
         public async Task ResolveCommentAsync(Guid commentId, Guid editorId, CancellationToken ct = default)

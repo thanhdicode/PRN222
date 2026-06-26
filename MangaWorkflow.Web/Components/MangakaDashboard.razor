@@ -1,0 +1,77 @@
+@using MangaWorkflow.Application.DTOs.Dashboard
+@using MangaWorkflow.Application.Interfaces.Services
+@inject IDashboardService DashboardService
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <h5 class="card-title">Active Series</h5>
+                <h2 class="mb-0">@Model?.ActiveSeriesCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <h5 class="card-title">Tasks Pending Review</h5>
+                <h2 class="mb-0">@Model?.PendingReviewCount</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Chapter Progress</h5>
+    </div>
+    <div class="card-body">
+        @if (Model?.ChapterProgress != null && Model.ChapterProgress.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Series</th>
+                            <th>Chapter</th>
+                            <th>Tasks</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.ChapterProgress)
+                        {
+                            var pct = item.TotalTasks > 0 ? (item.CompletedTasks * 100 / item.TotalTasks) : 0;
+                            <tr>
+                                <td>@item.SeriesTitle</td>
+                                <td>@item.ChapterTitle</td>
+                                <td>@item.CompletedTasks / @item.TotalTasks</td>
+                                <td class="align-middle">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" style="width: @pct%;" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100">@pct%</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted mb-0">No active chapters found.</p>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private MangakaDashboardDto? Model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await DashboardService.GetMangakaDashboardAsync(UserId);
+    }
+}

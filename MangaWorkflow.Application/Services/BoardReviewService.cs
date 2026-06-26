@@ -10,16 +10,16 @@ namespace MangaWorkflow.Application.Services
     {
         private readonly ISeriesRepository _seriesRepository;
         private readonly IBoardVoteRepository _voteRepository;
-        private readonly INotificationRepository _notificationRepository;
+        private readonly INotificationService _notificationService;
 
         public BoardReviewService(
             ISeriesRepository seriesRepository,
             IBoardVoteRepository voteRepository,
-            INotificationRepository notificationRepository)
+            INotificationService notificationService)
         {
             _seriesRepository = seriesRepository;
             _voteRepository = voteRepository;
-            _notificationRepository = notificationRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<List<BoardSeriesListItemDto>> GetSubmittedSeriesAsync(CancellationToken ct = default)
@@ -122,25 +122,15 @@ namespace MangaWorkflow.Application.Services
             var series = await _seriesRepository.GetByIdWithDetailsAsync(seriesId, ct);
             if (series == null) return;
 
-            // Get notification type (BoardVoteCast) — query by code
-            var notificationType = await _notificationRepository.GetTypeByCodeAsync(NotificationTypeCodes.BoardVoteCast, ct);
-            if (notificationType == null) return; // Graceful fallback if type not in DB
-
-            var notification = new Notification
-            {
-                NotificationId = Guid.NewGuid(),
-                UserId = series.MangakaId,
-                NotificationTypeId = notificationType.NotificationTypeId,
-                Title = "Board Vote Cast on Your Series",
-                Message = $"A board member has voted '{voteCode}' on your series '{series.Title}'.",
-                ReferenceType = "Series",
-                ReferenceId = seriesId,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _notificationRepository.AddAsync(notification, ct);
-            await _notificationRepository.SaveChangesAsync(ct);
+            await _notificationService.CreateAndSendAsync(
+                series.MangakaId,
+                NotificationTypeCodes.BoardVoteCast,
+                "Board Vote Cast on Your Series",
+                $"A board member has voted '{voteCode}' on your series '{series.Title}'.",
+                "Series",
+                seriesId,
+                ct
+            );
         }
     }
 }

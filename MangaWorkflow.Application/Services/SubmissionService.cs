@@ -14,20 +14,20 @@ namespace MangaWorkflow.Application.Services
     {
         private readonly ITaskSubmissionRepository _submissionRepo;
         private readonly IProductionTaskRepository _taskRepo;
-        private readonly INotificationRepository _notificationRepo;
+        private readonly INotificationService _notificationService;
         private readonly ISubmissionStatusRepository _submissionStatusRepo;
         private readonly INotificationTypeRepository _notificationTypeRepo;
 
         public SubmissionService(
             ITaskSubmissionRepository submissionRepo,
             IProductionTaskRepository taskRepo,
-            INotificationRepository notificationRepo,
+            INotificationService notificationService,
             ISubmissionStatusRepository submissionStatusRepo,
             INotificationTypeRepository notificationTypeRepo)
         {
             _submissionRepo = submissionRepo;
             _taskRepo = taskRepo;
-            _notificationRepo = notificationRepo;
+            _notificationService = notificationService;
             _submissionStatusRepo = submissionStatusRepo;
             _notificationTypeRepo = notificationTypeRepo;
         }
@@ -68,22 +68,15 @@ namespace MangaWorkflow.Application.Services
 
             if (mangakaId.HasValue)
             {
-                var notifTypeId = await _notificationTypeRepo.GetIdByCodeAsync("SubmissionUploaded", ct);
-                if (notifTypeId.HasValue)
-                {
-                    await _notificationRepo.AddAsync(new Notification
-                    {
-                        NotificationId = Guid.NewGuid(),
-                        UserId = mangakaId.Value,
-                        NotificationTypeId = notifTypeId.Value,
-                        Title = "New Submission",
-                        Message = $"Task \"{task.Title}\" was submitted by an assistant.",
-                        ReferenceType = "TaskSubmission",
-                        ReferenceId = submission.SubmissionId,
-                        IsRead = false,
-                        CreatedAt = DateTime.UtcNow
-                    }, ct);
-                }
+                await _notificationService.CreateAndSendAsync(
+                    mangakaId.Value,
+                    "SubmissionUploaded",
+                    "New Submission",
+                    $"Task \"{task.Title}\" was submitted by an assistant.",
+                    "TaskSubmission",
+                    submission.SubmissionId,
+                    ct
+                );
             }
         }
 
@@ -149,23 +142,15 @@ namespace MangaWorkflow.Application.Services
             };
             await _taskRepo.UpdateStatusAsync(submission.TaskId, taskStatusCode, ct);
 
-            // Notify assistant about the review outcome
-            var notifTypeId = await _notificationTypeRepo.GetIdByCodeAsync("SubmissionReviewed", ct);
-            if (notifTypeId.HasValue)
-            {
-                await _notificationRepo.AddAsync(new Notification
-                {
-                    NotificationId = Guid.NewGuid(),
-                    UserId = submission.SubmittedByAssistantId,
-                    NotificationTypeId = notifTypeId.Value,
-                    Title = "Submission Reviewed",
-                    Message = $"Review completed. Decision: {dto.Decision}",
-                    ReferenceType = "TaskSubmission",
-                    ReferenceId = submission.SubmissionId,
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow
-                }, ct);
-            }
+            await _notificationService.CreateAndSendAsync(
+                submission.SubmittedByAssistantId,
+                "SubmissionReviewed",
+                "Submission Reviewed",
+                $"Review completed. Decision: {dto.Decision}",
+                "TaskSubmission",
+                submission.SubmissionId,
+                ct
+            );
         }
     }
 }
