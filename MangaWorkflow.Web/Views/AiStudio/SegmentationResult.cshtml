@@ -1,0 +1,62 @@
+@model MangaWorkflow.Application.DTOs.Ai.AiSegmentationResponseDto
+
+@{
+    ViewData["Title"] = "AI Segmentation Result";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-bounding-box-circles"></i> AI Segmentation Results</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to AI Studio</a>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Model Used:</strong> @Model.ModelName <br />
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Page Image Preview</h5>
+                </div>
+                <div class="card-body text-center position-relative" id="image-container">
+                    <!-- Fake placeholder image for the page -->
+                    <img src="https://via.placeholder.com/600x800?text=Manga+Page" class="img-fluid" id="manga-page-img" alt="Manga Page" />
+                    
+                    <!-- Region Overlay Canvas -->
+                    <canvas id="region-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Detected Regions</h5>
+                </div>
+                <ul class="list-group list-group-flush" id="region-list">
+                    @foreach (var region in Model.Detections)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center" 
+                            data-x="@region.X" data-y="@region.Y" data-w="@region.Width" data-h="@region.Height">
+                            <span>
+                                <strong>@region.Label</strong>
+                                <br/>
+                                <small class="text-muted">Conf: @region.Confidence.ToString("P1")</small>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            
+            <form asp-action="GenerateTaskSuggestions" method="post">
+                <input type="hidden" name="pageId" value="@Model.PageId" />
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-list-task"></i> Generate Task Suggestions</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/ai-region-overlay.js"></script>
+}

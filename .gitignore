@@ -480,3 +480,17 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Python AI Artifacts
+MangaWorkflow.AI/.venv/
+MangaWorkflow.AI/datasets/raw/
+MangaWorkflow.AI/datasets/processed/
+MangaWorkflow.AI/datasets/coco/
+MangaWorkflow.AI/datasets/yolo/
+MangaWorkflow.AI/models/**/*.pt
+MangaWorkflow.AI/models/**/*.pth
+MangaWorkflow.AI/models/**/*.onnx
+MangaWorkflow.AI/experiments/
+MangaWorkflow.AI/runs/
+__pycache__/
+*.pyc

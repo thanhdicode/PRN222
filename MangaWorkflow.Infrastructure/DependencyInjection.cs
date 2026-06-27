@@ -41,6 +41,14 @@ namespace MangaWorkflow.Infrastructure
             // Phase 4 repositories
             services.AddScoped<IDashboardRepository, DashboardRepository>();
 
+            // Phase 5 AI clients
+            services.AddHttpClient<MangaWorkflow.Application.Interfaces.IAiVisionClient, MangaWorkflow.Infrastructure.Ai.MockAiVisionClient>(client =>
+            {
+                client.BaseAddress = new System.Uri(configuration["AiApi:BaseUrl"] ?? "http://localhost:8001");
+            });
+
+            services.AddScoped<MangaWorkflow.Application.Interfaces.IAiStudioService, MangaWorkflow.Infrastructure.Services.AiStudioService>();
+
             return services;
         }
     }

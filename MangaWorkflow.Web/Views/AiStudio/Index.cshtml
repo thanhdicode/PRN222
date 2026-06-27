@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "AI Studio";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="bi bi-robot"></i> MangaWorkflow AI Studio</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Welcome to AI Studio. Use this tool to automatically analyze manga pages, detect regions, and suggest tasks for your assistants.</p>
+                    
+                    <hr />
+                    
+                    <form asp-action="PageAnalysis" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label for="pageId" class="form-label">Enter Page ID to Analyze:</label>
+                            <input type="text" class="form-control" id="pageId" name="pageId" placeholder="e.g. 00000000-0000-0000-0000-000000000000" required>
+                            <div class="form-text">In a real app, this would be integrated into the page viewer.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-magic"></i> Run AI Segmentation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

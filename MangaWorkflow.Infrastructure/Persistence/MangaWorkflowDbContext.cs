@@ -94,6 +94,13 @@ public partial class MangaWorkflowDbContext : DbContext
 
     public virtual DbSet<WorkflowStatusHistory> WorkflowStatusHistories { get; set; }
 
+    public virtual DbSet<AiModelVersion> AiModelVersions { get; set; }
+    public virtual DbSet<AiInferenceRequest> AiInferenceRequests { get; set; }
+    public virtual DbSet<AiDetectedRegion> AiDetectedRegions { get; set; }
+    public virtual DbSet<AiTaskSuggestion> AiTaskSuggestions { get; set; }
+    public virtual DbSet<AiTrainingExperiment> AiTrainingExperiments { get; set; }
+    public virtual DbSet<AiEvaluationMetric> AiEvaluationMetrics { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AiSegmentationJob>(entity =>
@@ -934,6 +941,132 @@ public partial class MangaWorkflowDbContext : DbContext
             entity.HasOne(d => d.ChangedByUser).WithMany(p => p.WorkflowStatusHistories)
                 .HasForeignKey(d => d.ChangedByUserId)
                 .HasConstraintName("FK_WorkflowStatusHistories_ChangedBy");
+        });
+
+        modelBuilder.Entity<AiModelVersion>(entity =>
+        {
+            entity.HasKey(e => e.ModelVersionId);
+            entity.Property(e => e.ModelVersionId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.ModelName).HasMaxLength(100);
+            entity.Property(e => e.ModelType).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.VersionLabel).HasMaxLength(100);
+            entity.Property(e => e.Framework).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.ModelPath).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+        });
+
+        modelBuilder.Entity<AiInferenceRequest>(entity =>
+        {
+            entity.HasKey(e => e.InferenceRequestId);
+            entity.HasIndex(e => new { e.PageId, e.Status }, "IX_AiInferenceRequests_PageId_Status");
+            entity.Property(e => e.InferenceRequestId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.RequestType).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.Status).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Page).WithMany()
+                .HasForeignKey(d => d.PageId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_AiInferenceRequests_Page");
+
+            entity.HasOne(d => d.RequestedByUser).WithMany()
+                .HasForeignKey(d => d.RequestedByUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AiInferenceRequests_RequestedBy");
+
+            entity.HasOne(d => d.ModelVersion).WithMany()
+                .HasForeignKey(d => d.ModelVersionId)
+                .HasConstraintName("FK_AiInferenceRequests_ModelVersion");
+        });
+
+        modelBuilder.Entity<AiDetectedRegion>(entity =>
+        {
+            entity.HasKey(e => e.DetectedRegionId);
+            entity.HasIndex(e => e.PageId, "IX_AiDetectedRegions_PageId");
+            entity.Property(e => e.DetectedRegionId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.RegionTypeCode).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.X).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Y).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Width).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Height).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Confidence).HasColumnType("decimal(5, 4)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.InferenceRequest).WithMany()
+                .HasForeignKey(d => d.InferenceRequestId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_AiDetectedRegions_InferenceRequest");
+
+            entity.HasOne(d => d.Page).WithMany()
+                .HasForeignKey(d => d.PageId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_AiDetectedRegions_Page");
+
+            entity.HasOne(d => d.PageRegion).WithMany()
+                .HasForeignKey(d => d.PageRegionId)
+                .HasConstraintName("FK_AiDetectedRegions_PageRegion");
+        });
+
+        modelBuilder.Entity<AiTaskSuggestion>(entity =>
+        {
+            entity.HasKey(e => e.TaskSuggestionId);
+            entity.HasIndex(e => new { e.PageId, e.Status }, "IX_AiTaskSuggestions_PageId_Status");
+            entity.Property(e => e.TaskSuggestionId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.TaskTypeCode).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.ComplexityScore).HasColumnType("decimal(5, 2)").HasDefaultValue(1m);
+            entity.Property(e => e.EstimatedHours).HasColumnType("decimal(6, 2)");
+            entity.Property(e => e.EstimatedAmount).HasColumnType("decimal(12, 2)");
+            entity.Property(e => e.Status).HasMaxLength(50).IsUnicode(false).HasDefaultValue("Draft");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Page).WithMany()
+                .HasForeignKey(d => d.PageId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_AiTaskSuggestions_Page");
+
+            entity.HasOne(d => d.PageRegion).WithMany()
+                .HasForeignKey(d => d.PageRegionId)
+                .HasConstraintName("FK_AiTaskSuggestions_PageRegion");
+
+            entity.HasOne(d => d.SuggestedAssistant).WithMany()
+                .HasForeignKey(d => d.SuggestedAssistantId)
+                .HasConstraintName("FK_AiTaskSuggestions_SuggestedAssistant");
+        });
+
+        modelBuilder.Entity<AiTrainingExperiment>(entity =>
+        {
+            entity.HasKey(e => e.ExperimentId);
+            entity.Property(e => e.ExperimentId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.ExperimentName).HasMaxLength(200);
+            entity.Property(e => e.ModelType).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.DatasetName).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+        });
+
+        modelBuilder.Entity<AiEvaluationMetric>(entity =>
+        {
+            entity.HasKey(e => e.MetricId);
+            entity.HasIndex(e => e.ModelVersionId, "IX_AiEvaluationMetrics_ModelVersionId");
+            entity.Property(e => e.MetricId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.ClassName).HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.IoU).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.DiceF1).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.PrecisionValue).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.RecallValue).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.Map50).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.Map5095).HasColumnType("decimal(6, 4)");
+            entity.Property(e => e.LatencyMs).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.Experiment).WithMany()
+                .HasForeignKey(d => d.ExperimentId)
+                .HasConstraintName("FK_AiEvaluationMetrics_Experiment");
+
+            entity.HasOne(d => d.ModelVersion).WithMany()
+                .HasForeignKey(d => d.ModelVersionId)
+                .HasConstraintName("FK_AiEvaluationMetrics_ModelVersion");
         });
 
         OnModelCreatingPartial(modelBuilder);

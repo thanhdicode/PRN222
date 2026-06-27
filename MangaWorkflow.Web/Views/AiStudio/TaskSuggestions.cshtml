@@ -1,0 +1,82 @@
+@model IEnumerable<MangaWorkflow.Domain.Entities.AiTaskSuggestion>
+
+@{
+    ViewData["Title"] = "AI Task Suggestions";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-robot"></i> AI Task Suggestions</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to AI Studio</a>
+    </div>
+
+    <div class="alert alert-info">
+        The AI has analyzed the page and suggests the following tasks for your assistants based on the detected regions.
+        Review and approve them below.
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered bg-white shadow-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Suggestion ID</th>
+                        <th>Suggested Role</th>
+                        <th>Task Type</th>
+                        <th>Description</th>
+                        <th>Confidence</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var suggestion in Model)
+                    {
+                        <tr>
+                            <td>@suggestion.TaskSuggestionId.ToString().Substring(0, 8)...</td>
+                            <td><span class="badge bg-secondary">Assistant</span></td>
+                            <td>@suggestion.TaskTypeCode</td>
+                            <td>@suggestion.Description</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar @(suggestion.ComplexityScore > 4 ? "bg-danger" : (suggestion.ComplexityScore > 2 ? "bg-warning text-dark" : "bg-success"))" 
+                                         role="progressbar" 
+                                         style="width: @(suggestion.ComplexityScore * 20)%;" 
+                                         aria-valuenow="@(suggestion.ComplexityScore * 20)" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        @suggestion.ComplexityScore / 5
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (suggestion.Status == "Approved")
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> Pending Review</span>
+                                }
+                            </td>
+                            <td>
+                                @if (suggestion.Status != "Approved")
+                                {
+                                    <button class="btn btn-sm btn-success" title="Approve and create task"><i class="bi bi-check-lg"></i> Approve</button>
+                                    <button class="btn btn-sm btn-danger" title="Reject"><i class="bi bi-x-lg"></i> Reject</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            No task suggestions were generated for this page.
+        </div>
+    }
+</div>
