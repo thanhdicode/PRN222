@@ -1,0 +1,210 @@
+@model IEnumerable<MangaWorkflow.Domain.Entities.AiTaskSuggestion>
+
+@{
+    ViewData["Title"] = "AI Task Suggestions";
+
+    var taskTypeColors = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "LayoutCleanup", "primary" },
+        { "SpeechBubbleCleanup", "info" },
+        { "CleanLine", "warning" },
+        { "Tone", "secondary" },
+        { "BackgroundDrawing", "success" },
+        { "Shading", "dark" },
+        { "Effect", "danger" },
+        { "Other", "secondary" }
+    };
+}
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-lightning"></i> AI Task Suggestions</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to AI Studio
+        </a>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="alert alert-info py-2">
+        <i class="bi bi-info-circle"></i>
+        The AI analyzed accepted regions and suggests tasks. Review and <strong>approve</strong> to create production tasks, or <strong>reject</strong> to dismiss.
+    </div>
+
+    <!-- Flash Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+            @foreach (var suggestion in Model)
+            {
+                var typeColor = taskTypeColors.TryGetValue(suggestion.TaskTypeCode, out var color) ? color : "secondary";
+                var isDraft = suggestion.Status == "Draft";
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm @(isDraft ? "border-primary" : (suggestion.Status == "Approved" ? "border-success" : "border-danger"))">
+                        <!-- Card Header -->
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                            <span class="badge bg-@typeColor fs-6">
+                                <i class="bi bi-tag"></i> @suggestion.TaskTypeCode
+                            </span>
+                            @if (suggestion.Status == "Draft")
+                            {
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock"></i> Draft</span>
+                            }
+                            else if (suggestion.Status == "Approved")
+                            {
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> Approved</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Rejected</span>
+                            }
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <h6 class="card-title mb-1">@suggestion.Title</h6>
+                            <p class="card-text text-muted small mb-2">@suggestion.Description</p>
+
+                            <!-- Complexity Score -->
+                            <div class="mb-2">
+                                <small class="text-muted d-block mb-1">Complexity</small>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar @(suggestion.ComplexityScore > 4 ? "bg-danger" : (suggestion.ComplexityScore > 2 ? "bg-warning text-dark" : "bg-success"))"
+                                         role="progressbar"
+                                         style="width: @(suggestion.ComplexityScore * 20)%"
+                                         aria-valuenow="@(suggestion.ComplexityScore * 20)" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <small class="text-muted">@suggestion.ComplexityScore / 5</small>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-white">
+                            @if (isDraft)
+                            {
+                                <div class="d-flex gap-2">
+                                    <!-- Approve Button (opens modal) -->
+                                    <button type="button" class="btn btn-sm btn-success flex-grow-1" data-bs-toggle="modal" data-bs-target="#approveModal-@suggestion.TaskSuggestionId">
+                                        <i class="bi bi-check-lg"></i> Approve
+                                    </button>
+                                    <!-- Reject Button -->
+                                    <form asp-action="RejectTaskSuggestion" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="suggestionId" value="@suggestion.TaskSuggestionId" />
+                                        <input type="hidden" name="pageId" value="@suggestion.PageId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Reject this suggestion?')">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                            else
+                            {
+                                <small class="text-muted"><i class="bi bi-lock"></i> No further actions</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approve Modal (outside card to avoid nesting issues) -->
+                @if (isDraft)
+                {
+                    <div class="modal fade" id="approveModal-@suggestion.TaskSuggestionId" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-action="ApproveTaskSuggestion" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="suggestionId" value="@suggestion.TaskSuggestionId" />
+                                    <input type="hidden" name="pageId" value="@suggestion.PageId" />
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="bi bi-check-circle text-success"></i> Approve Task Suggestion
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- Summary -->
+                                        <div class="alert alert-light mb-3">
+                                            <div class="row">
+                                                <div class="col-4"><strong>Task:</strong></div>
+                                                <div class="col-8">@suggestion.Title</div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-4"><strong>Type:</strong></div>
+                                                <div class="col-8"><span class="badge bg-@typeColor">@suggestion.TaskTypeCode</span></div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-4"><strong>Complexity:</strong></div>
+                                                <div class="col-8">@suggestion.ComplexityScore / 5</div>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-muted small">@suggestion.Description</p>
+
+                                        <!-- Assistant Selection -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                <i class="bi bi-person-badge"></i> Assign to Assistant
+                                            </label>
+                                            <select class="form-select" name="assistantId">
+                                                <option value="">-- Select Assistant --</option>
+                                                @if (ViewBag.Assistants != null)
+                                                {
+                                                    foreach (var assistant in (List<MangaWorkflow.Domain.Entities.User>)ViewBag.Assistants)
+                                                    {
+                                                        <option value="@assistant.UserId">@assistant.FullName (@assistant.Email)</option>
+                                                    }
+                                                }
+                                            </select>
+                                            <div class="form-text">Select an assistant to assign this task to.</div>
+                                        </div>
+
+                                        <!-- Deadline Picker -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">
+                                                <i class="bi bi-calendar-event"></i> Deadline
+                                            </label>
+                                            <input type="datetime-local" class="form-control" name="deadline" />
+                                            <div class="form-text">Set a deadline for task completion.</div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-lg"></i> Approve & Create Task
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-emoji-neutral" style="font-size: 2rem;"></i>
+            <p class="mt-2 mb-0">No task suggestions were generated. Accept detected regions first, then generate suggestions.</p>
+        </div>
+    }
+</div>

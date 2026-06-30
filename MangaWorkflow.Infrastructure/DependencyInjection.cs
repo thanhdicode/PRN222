@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MangaWorkflow.Infrastructure.Persistence;
 using MangaWorkflow.Application.Interfaces.Repositories;
+using MangaWorkflow.Application.Options;
 using MangaWorkflow.Infrastructure.Repositories;
 
 namespace MangaWorkflow.Infrastructure
@@ -37,9 +38,29 @@ namespace MangaWorkflow.Infrastructure
             // Phase 3 stabilization — lookup repos (no hardcoded IDs)
             services.AddScoped<ISubmissionStatusRepository, SubmissionStatusRepository>();
             services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+            services.AddScoped<ITaskTypeRepository, TaskTypeRepository>();
+            services.AddScoped<ITaskStatusRepository, TaskStatusRepository>();
 
             // Phase 4 repositories
             services.AddScoped<IDashboardRepository, DashboardRepository>();
+
+            // Phase 5 AI repositories
+            services.AddScoped<IAiInferenceRepository, AiInferenceRepository>();
+            services.AddScoped<IAiDetectedRegionRepository, AiDetectedRegionRepository>();
+            services.AddScoped<IAiTaskSuggestionRepository, AiTaskSuggestionRepository>();
+
+            // Phase 5 AI configuration
+            services.Configure<AiVisionOptions>(configuration.GetSection("AI"));
+
+            // Phase 5 AI clients
+            services.AddHttpClient<MangaWorkflow.Application.Interfaces.IAiVisionClient, MangaWorkflow.Infrastructure.Ai.MockAiVisionClient>(client =>
+            {
+                var aiBaseUrl = configuration["AI:BaseUrl"] ?? "http://localhost:8001";
+                client.BaseAddress = new System.Uri(aiBaseUrl);
+                
+                var timeoutSeconds = configuration.GetValue<int>("AI:TimeoutSeconds", 60);
+                client.Timeout = System.TimeSpan.FromSeconds(timeoutSeconds);
+            });
 
             return services;
         }

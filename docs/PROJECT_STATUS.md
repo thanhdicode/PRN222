@@ -1,11 +1,12 @@
 # PRN222 MangaWorkflowSystem — Project Status
 
 ## Current Phase: ALL PHASES COMPLETE
-**Current Phase:** Phase 5 — Worker Service & Final Demo
+**Current Phase:** AI Studio V1 Stabilization — COMPLETE
 **Next Phase:** None
 
-**Last Updated**: 2026-06-27
-**Build Status**: ✅ PASSING
+**Last Updated**: 2026-06-30
+**Build Status**: ✅ PASSING (0 errors)
+**Test Status**: ✅ 16/16 PASSING
 
 ---
 
@@ -174,4 +175,38 @@ dotnet run --project MangaWorkflow.Worker
 ## Next Recommended Action
 
 Demonstrate the project to the instructor using the `FINAL_DEMO_SCRIPT.md` checklist.
+
+---
+
+## ✅ AI Studio V1 Stabilization (DONE)
+
+Status: DONE
+Branch: feature/ai-studio-fullstack
+Completed: 2026-06-30
+
+This stabilization work completed the human-in-the-loop AI workflow
+(detect → review → accept → suggest → approve → execute) and fixed
+architectural issues. See `docs/specs/AI_STUDIO_V1_STABILIZATION_SPEC.md`.
+
+### Tasks completed
+- [x] Task 1: Pass Real Page Image Into AI
+- [x] Task 2: Move AiStudioService to Application Layer (removed direct DbContext)
+- [x] Task 3: Add Accept/Reject Detected Region Flow (creates PageRegion, SourceType="AI")
+- [x] Task 4: Fix Task Suggestion Logic (region-type → TaskType mapping with "Other" fallback)
+- [x] Task 5: Add Approve/Reject Task Suggestion Flow (creates ProductionTask)
+- [x] Task 6: Fix AI DB Script Integrity (11 FK + 4 check constraints, IF NOT EXISTS guards)
+- [x] Task 7: Fix AI Configuration (AiVisionOptions, FallbackToMock)
+- [x] Task 8: Improve AI Studio UI Flow (region cards, color badges, confidence bars, approve modals)
+- [x] Task 9: Update Training Docs for Honesty (mock-mode disclaimers, placeholder scripts)
+- [x] Task 10: Add Verification and Tests (AiStudioServiceTests — 15 tests passing)
+
+### Bug fixes applied (2026-06-30)
+- [x] Build error: Razor `@page` directive collision — renamed loop variable `page`→`item`
+  and MVC action `PageAnalysis`→`Analyze` in `Index.cshtml` / `AiStudioController.cs`
+- [x] Ambiguous `TaskStatus` reference resolved in `AiStudioServiceTests.cs`
+
+### Verification (2026-06-30)
+- ✅ `dotnet build` — 0 errors, 4 warnings (NuGet vulnerability advisories only)
+- ✅ `dotnet test` — 16/16 passed (1 MockAiVisionClient + 15 AiStudioService)
+- ✅ All 10 AI Studio tasks complete and merge-ready
 
