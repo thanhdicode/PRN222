@@ -24,4 +24,5 @@ class SegmentationResponse(BaseModel):
     pageId: str
     modelName: str
     modelVersion: str
+    imageUrl: Optional[str] = None  # Echo back the image URL for verification
     detections: List[DetectedRegion]

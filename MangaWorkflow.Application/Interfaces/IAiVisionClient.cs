@@ -6,5 +6,5 @@ namespace MangaWorkflow.Application.Interfaces;
 
 public interface IAiVisionClient
 {
-    Task<AiSegmentationResponseDto> SegmentPageAsync(string pageId, CancellationToken cancellationToken = default);
+    Task<AiSegmentationResponseDto> SegmentPageAsync(AiSegmentationRequestDto request, CancellationToken cancellationToken = default);
 }

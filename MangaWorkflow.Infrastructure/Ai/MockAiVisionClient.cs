@@ -21,11 +21,10 @@ public class MockAiVisionClient : IAiVisionClient
         _logger = logger;
     }
 
-    public async Task<AiSegmentationResponseDto> SegmentPageAsync(string pageId, CancellationToken cancellationToken = default)
+    public async Task<AiSegmentationResponseDto> SegmentPageAsync(AiSegmentationRequestDto request, CancellationToken cancellationToken = default)
     {
         try
         {
-            var request = new AiSegmentationRequestDto { PageId = pageId };
             var response = await _httpClient.PostAsJsonAsync("/api/segment", request, cancellationToken);
             
             if (response.IsSuccessStatusCode)
@@ -44,9 +43,10 @@ public class MockAiVisionClient : IAiVisionClient
         // Fallback mock logic if API is unreachable
         return new AiSegmentationResponseDto
         {
-            PageId = pageId,
+            PageId = request.PageId,
             ModelName = "mock-yolo-seg-fallback",
             ModelVersion = "v1-fallback",
+            ImageUrl = request.ImageUrl,
             Detections = new List<AiDetectedRegionDto>
             {
                 new AiDetectedRegionDto { Label = "Panel", Confidence = 0.95m, X = 10, Y = 10, Width = 400, Height = 300 },

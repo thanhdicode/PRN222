@@ -21,5 +21,6 @@ def _mock_segmentation(request: SegmentationRequest) -> SegmentationResponse:
         pageId=request.pageId,
         modelName="mock-yolo-seg",
         modelVersion="v1",
+        imageUrl=request.imageUrl,  # Echo back the image URL
         detections=detections
     )

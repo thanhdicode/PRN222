@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using MangaWorkflow.Application.Interfaces;
 using MangaWorkflow.Application.Interfaces.Services;
 using MangaWorkflow.Application.Services;
 
@@ -30,6 +31,9 @@ namespace MangaWorkflow.Application
 
             // Phase 4 services
             services.AddSingleton<IWorkflowHubNotifier, MangaWorkflow.Application.Implementations.NoOpWorkflowHubNotifier>();
+
+            // Phase 5 AI services
+            services.AddScoped<IAiStudioService, AiStudioService>();
 
             return services;
         }

@@ -42,7 +42,12 @@ namespace MangaWorkflow.Tests
             var client = new MockAiVisionClient(httpClient, logger);
 
             // Act
-            var result = await client.SegmentPageAsync("test-page-id");
+            var request = new MangaWorkflow.Application.DTOs.Ai.AiSegmentationRequestDto
+            {
+                PageId = "test-page-id",
+                Mode = "mock"
+            };
+            var result = await client.SegmentPageAsync(request);
 
             // Assert
             Assert.NotNull(result);
