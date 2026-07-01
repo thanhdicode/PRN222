@@ -1,12 +1,12 @@
-﻿@page
+@page
 @model MangaWorkflow.Web.Pages.Assistant.SubmitTaskModel
 @{
-    ViewData["Title"] = "Submit Task";
+    ViewData["Title"] = "Submit Assistant Work";
 }
 
-<div class="container py-4">
+<section class="assistant-shell">
     <div class="mb-3">
-        <a asp-page="/Assistant/TaskDetail" asp-route-taskId="@Model.Task?.TaskId" class="btn btn-outline-secondary">&laquo; Back to Task</a>
+        <a asp-page="/Assistant/TaskDetail" asp-route-taskId="@Model.Task?.TaskId" class="btn btn-outline-secondary btn-sm">&laquo; Back to Task</a>
     </div>
 
     @if (Model.Task == null)
@@ -15,42 +15,66 @@
     }
     else
     {
-        <div class="card shadow-sm max-w-lg mx-auto">
-            <div class="card-header bg-white">
-                <h4 class="mb-0">Submit Work: @Model.Task.Title</h4>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <p class="text-uppercase text-success fw-semibold small mb-2">Submit work</p>
+                        <h1 class="h4 mb-2">@Model.Task.Title</h1>
+                        <p class="text-muted">Upload a file or paste a URL. On submit, Mangaka gets a notification and this becomes visible in Review Submissions.</p>
+
+                        <form method="post" enctype="multipart/form-data" class="mt-4">
+                            <input type="hidden" asp-for="Input.TaskId" />
+
+                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.UploadedFile" class="form-label">Upload file</label>
+                                <input type="file" asp-for="Input.UploadedFile" class="form-control" />
+                                <div class="form-text">Accepted for demo: PNG, JPG, WEBP, PDF, ZIP, RAR. Max 20MB.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.FileUrl" class="form-label">File URL</label>
+                                <input asp-for="Input.FileUrl" class="form-control" placeholder="https://example.com/submission.png" />
+                                <span asp-validation-for="Input.FileUrl" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.Notes" class="form-label">Submission notes</label>
+                                <textarea asp-for="Input.Notes" class="form-control" rows="5" placeholder="Describe what changed, what needs review, or where the reviewer should look."></textarea>
+                                <span asp-validation-for="Input.Notes" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">Submit Work and Notify Mangaka</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="Input.TaskId" />
-                    
-                    <div class="mb-3">
-                        <label asp-for="Input.Notes" class="form-label">Submission Notes (optional)</label>
-                        <textarea asp-for="Input.Notes" class="form-control" rows="4" placeholder="Describe what you did..."></textarea>
-                        <span asp-validation-for="Input.Notes" class="text-danger"></span>
-                    </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Input.UploadedFile" class="form-label">Upload File (PNG, JPG, ZIP, PDF)</label>
-                        <input type="file" asp-for="Input.UploadedFile" class="form-control" />
-                        <div class="form-text">Or provide a URL below if file is too large.</div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body">
+                        <h2 class="h6">Demo result</h2>
+                        <ul class="small text-muted mb-0">
+                            <li>Creates a `TaskSubmission` row.</li>
+                            <li>Moves task to `Submitted`.</li>
+                            <li>Sends a Mangaka notification through SignalR.</li>
+                        </ul>
                     </div>
+                </div>
 
-                    <div class="mb-4">
-                        <label asp-for="Input.FileUrl" class="form-label">File URL (optional)</label>
-                        <input asp-for="Input.FileUrl" class="form-control" placeholder="https://..." />
-                        <span asp-validation-for="Input.FileUrl" class="text-danger"></span>
-                    </div>
-
-                    @if (!ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger" asp-validation-summary="All"></div>
-                    }
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success btn-lg">Submit Task</button>
-                    </div>
-                </form>
+                @if (!string.IsNullOrEmpty(Model.Task.PageImageUrl))
+                {
+                    <img src="@Model.Task.PageImageUrl" class="img-fluid rounded border shadow-sm assistant-page-preview" alt="Page Reference" />
+                }
             </div>
         </div>
     }
-</div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

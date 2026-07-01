@@ -75,8 +75,15 @@
                             }
                             @if (User.IsInRole("Assistant"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Assistant/TaskInbox">My Tasks</a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" id="assistantDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Assistant
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="assistantDropdown">
+                                        <li><a class="dropdown-item" asp-area="Assistant" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Assistant/TaskInbox">Task Inbox</a></li>
+                                        <li><a class="dropdown-item" asp-area="Assistant" asp-controller="Tasks" asp-action="Index">MVC Tasks</a></li>
+                                    </ul>
                                 </li>
                             }
                             @if (User.IsInRole("Editor") || User.IsInRole("TantouEditor") || User.IsInRole("Admin"))

@@ -19,6 +19,7 @@ html {
 
 body {
   margin-bottom: 60px;
+  background-color: #f6f7fb;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +29,90 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+.assistant-shell {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.assistant-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(13, 110, 253, 0.12);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 0.35rem 1.2rem rgba(15, 23, 42, 0.06);
+}
+
+.assistant-metric,
+.assistant-info-box {
+  height: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 0.25rem 0.9rem rgba(15, 23, 42, 0.04);
+}
+
+.assistant-metric span,
+.assistant-info-box span {
+  display: block;
+  color: #6c757d;
+  font-size: 0.82rem;
+  margin-bottom: 0.35rem;
+}
+
+.assistant-metric strong {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.assistant-info-box strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.assistant-metric.danger {
+  border-color: rgba(220, 53, 69, 0.25);
+}
+
+.assistant-metric.danger strong {
+  color: #dc3545;
+}
+
+.assistant-table thead th {
+  color: #6c757d;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #f8f9fc;
+}
+
+.assistant-page-preview {
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  background: #f8f9fa;
+}
+
+.assistant-empty-preview {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+@media (max-width: 767.98px) {
+  .assistant-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

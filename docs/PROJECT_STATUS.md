@@ -295,3 +295,26 @@ Completed: 2026-07-01
 ### Next recommended demo action
 - Refresh the browser and login as each role to demo populated dashboards, list screens,
   Assistant task workflow, Board review, ranking screens, notifications, and Worker logs.
+---
+
+## Assistant UI Demo Upgrade (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### What was fixed
+- [x] Added Razor Pages `_ViewStart.cshtml` and `_ViewImports.cshtml` so `/Assistant/TaskInbox`,
+  `/Assistant/TaskDetail`, and `/Assistant/SubmitTask` use the shared Bootstrap layout, navbar,
+  auth menu, and SignalR notification scripts.
+- [x] Rebuilt Assistant Task Inbox into a demo-ready workspace with hero section, summary metrics,
+  status filter, task queue, status badges, action buttons, demo checklist, and SignalR proof panel.
+- [x] Rebuilt Assistant Task Detail with task metadata, workflow actions, page preview, and demo notes.
+- [x] Rebuilt Assistant Submit Work page with clearer upload/URL/notes flow and SignalR notification explanation.
+- [x] Changed navbar Assistant menu into a dropdown with Dashboard, Task Inbox, and MVC Tasks links.
+- [x] Added scoped Assistant UI CSS in `wwwroot/css/site.css`.
+
+### Verification
+- [x] `dotnet build` passes with 0 errors.
+- [x] `dotnet test` passes: 18/18.
+- [x] Browser automation verified `/Assistant/TaskInbox` has navbar, hero, 4 metric cards,
+  task rows, Open/Submit actions, and SignalR proof block.

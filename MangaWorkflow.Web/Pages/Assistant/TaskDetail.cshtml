@@ -1,17 +1,20 @@
-﻿@page
+@page
 @model MangaWorkflow.Web.Pages.Assistant.TaskDetailModel
 @{
-    ViewData["Title"] = "Task Detail";
+    ViewData["Title"] = "Assistant Task Detail";
 }
 
-<div class="container py-4">
+<section class="assistant-shell">
     <div class="mb-3">
-        <a asp-page="/Assistant/TaskInbox" class="btn btn-outline-secondary">&laquo; Back to Inbox</a>
+        <a asp-page="/Assistant/TaskInbox" class="btn btn-outline-secondary btn-sm">&laquo; Back to Inbox</a>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     }
 
     @if (Model.Task == null)
@@ -20,53 +23,104 @@
     }
     else
     {
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">@Model.Task.Title</h4>
-                        <span class="badge bg-primary">@Model.Task.StatusName</span>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                            <div>
+                                <p class="text-uppercase text-primary fw-semibold small mb-2">@Model.Task.TypeCode</p>
+                                <h1 class="h3 mb-2">@Model.Task.Title</h1>
+                                <p class="text-muted mb-0">Assigned to @(Model.Task.AssignedToUserName ?? "current assistant")</p>
+                            </div>
+                            <span class="badge rounded-pill @StatusClass(Model.Task.StatusCode) fs-6">@Model.Task.StatusName</span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <div class="assistant-info-box">
+                                    <span>Deadline</span>
+                                    <strong>@(Model.Task.Deadline?.ToString("yyyy-MM-dd HH:mm") ?? "No deadline")</strong>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="assistant-info-box">
+                                    <span>Page ID</span>
+                                    <strong class="text-truncate">@Model.Task.PageId</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 class="h6">Instructions</h2>
+                        <p class="text-muted">@(string.IsNullOrWhiteSpace(Model.Task.Instructions) ? "No extra instructions were provided." : Model.Task.Instructions)</p>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Task.Description) && Model.Task.Description != Model.Task.Instructions)
+                        {
+                            <h2 class="h6 mt-4">Description</h2>
+                            <p class="text-muted">@Model.Task.Description</p>
+                        }
                     </div>
+                    <div class="card-footer bg-white p-4">
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.Task.StatusCode == "Assigned")
+                            {
+                                <form method="post" asp-page-handler="Start" asp-route-taskId="@Model.Task.TaskId">
+                                    <button type="submit" class="btn btn-primary">Start Task</button>
+                                </form>
+                            }
+                            @if (Model.Task.StatusCode == "InProgress" || Model.Task.StatusCode == "RevisionRequired")
+                            {
+                                <a asp-page="/Assistant/SubmitTask" asp-route-taskId="@Model.Task.TaskId" class="btn btn-success">Submit Work</a>
+                            }
+                            <a asp-page="/Assistant/TaskInbox" class="btn btn-outline-secondary">Back to Queue</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
                     <div class="card-body">
-                        <p><strong>Instructions:</strong></p>
-                        <p class="text-muted">@(string.IsNullOrEmpty(Model.Task.Instructions) ? "None" : Model.Task.Instructions)</p>
-                        
-                        <hr />
-                        
-                        <p><strong>Deadline:</strong> @(Model.Task.Deadline?.ToString("f") ?? "None")</p>
-                    </div>
-                    <div class="card-footer bg-light">
-                        @if (Model.Task.StatusCode == "Assigned")
-                        {
-                            <form method="post" asp-page-handler="Start" asp-route-taskId="@Model.Task.TaskId">
-                                <button type="submit" class="btn btn-primary">Start Task</button>
-                            </form>
-                        }
-                        else if (Model.Task.StatusCode == "InProgress" || Model.Task.StatusCode == "RevisionRequired")
-                        {
-                            <a asp-page="/Assistant/SubmitTask" asp-route-taskId="@Model.Task.TaskId" class="btn btn-success">Submit Task</a>
-                        }
+                        <h2 class="h6">What this demonstrates</h2>
+                        <div class="row g-3 small text-muted">
+                            <div class="col-md-4"><span class="badge text-bg-primary me-1">1</span> Authorization protects assistant-only task details.</div>
+                            <div class="col-md-4"><span class="badge text-bg-primary me-1">2</span> Start Task updates workflow status through service/repository.</div>
+                            <div class="col-md-4"><span class="badge text-bg-primary me-1">3</span> Submit Work creates a submission and notification.</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Page Image</h5>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h2 class="h6 mb-0">Page reference</h2>
                     </div>
-                    <div class="card-body text-center">
+                    <div class="card-body">
                         @if (!string.IsNullOrEmpty(Model.Task.PageImageUrl))
                         {
-                            <img src="@Model.Task.PageImageUrl" class="img-fluid rounded" alt="Page Reference" />
+                            <img src="@Model.Task.PageImageUrl" class="img-fluid rounded border assistant-page-preview" alt="Page Reference" />
                         }
                         else
                         {
-                            <p class="text-muted">No image available.</p>
+                            <div class="assistant-empty-preview">No page preview</div>
                         }
                     </div>
                 </div>
             </div>
         </div>
     }
-</div>
+</section>
+
+@functions {
+    private static string StatusClass(string statusCode) => statusCode switch
+    {
+        "Assigned" => "text-bg-secondary",
+        "InProgress" => "text-bg-primary",
+        "Submitted" => "text-bg-warning",
+        "Approved" => "text-bg-success",
+        "Rejected" => "text-bg-danger",
+        "RevisionRequired" => "text-bg-danger",
+        "Overdue" => "text-bg-danger",
+        "Cancelled" => "text-bg-dark",
+        _ => "text-bg-light"
+    };
+}
