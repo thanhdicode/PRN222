@@ -54,8 +54,8 @@ namespace MangaWorkflow.Application.Services
                 UserId = Guid.NewGuid(),
                 Email = dto.Email,
                 FullName = dto.FullName ?? dto.Email,
-                // TODO: Replace plain-text with BCrypt hashing for production
-                PasswordHash = dto.Password,
+                // BCrypt hash with work factor 12
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password, workFactor: 12),
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };

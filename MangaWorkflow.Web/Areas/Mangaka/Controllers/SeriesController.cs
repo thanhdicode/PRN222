@@ -18,10 +18,13 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Series
+        [HttpGet]
         public async Task<IActionResult> Index(string? statusCode, string? keyword, CancellationToken ct)
         {
             var mangakaId = GetCurrentUserId();
-            var series = await _seriesService.GetSeriesForMangakaAsync(mangakaId, statusCode, keyword, ct);
+            if (mangakaId == null) return Unauthorized();
+
+            var series = await _seriesService.GetSeriesForMangakaAsync(mangakaId.Value, statusCode, keyword, ct);
             var statuses = await _seriesService.GetStatusesAsync(ct);
             ViewBag.Statuses = statuses;
             ViewBag.SelectedStatus = statusCode;
@@ -30,16 +33,18 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Series/Details/{id}
+        [HttpGet]
         public async Task<IActionResult> Details(Guid id, CancellationToken ct)
         {
             var series = await _seriesService.GetSeriesDetailAsync(id, ct);
             if (series == null) return NotFound();
 
-            EnsureOwnsSeries(series.MangakaId);
+            if (!OwnsSeries(series.MangakaId)) return Forbid();
             return View(series);
         }
 
         // GET /Mangaka/Series/Create
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -53,10 +58,12 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
+            var mangakaId = GetCurrentUserId();
+            if (mangakaId == null) return Unauthorized();
+
             try
             {
-                var mangakaId = GetCurrentUserId();
-                var seriesId = await _seriesService.CreateSeriesAsync(dto, mangakaId, ct);
+                var seriesId = await _seriesService.CreateSeriesAsync(dto, mangakaId.Value, ct);
                 TempData["Success"] = $"Series '{dto.Title}' created successfully.";
                 return RedirectToAction(nameof(Details), new { id = seriesId });
             }
@@ -68,12 +75,13 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Series/Edit/{id}
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
         {
             var series = await _seriesService.GetSeriesDetailAsync(id, ct);
             if (series == null) return NotFound();
 
-            EnsureOwnsSeries(series.MangakaId);
+            if (!OwnsSeries(series.MangakaId)) return Forbid();
 
             var dto = new EditSeriesDto
             {
@@ -96,6 +104,11 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
             if (!ModelState.IsValid)
                 return View(dto);
 
+            // Re-check ownership on POST to prevent IDOR
+            var series = await _seriesService.GetSeriesDetailAsync(id, ct);
+            if (series == null) return NotFound();
+            if (!OwnsSeries(series.MangakaId)) return Forbid();
+
             try
             {
                 await _seriesService.UpdateSeriesAsync(dto, ct);
@@ -114,10 +127,12 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
+            var mangakaId = GetCurrentUserId();
+            if (mangakaId == null) return Unauthorized();
+
             try
             {
-                var mangakaId = GetCurrentUserId();
-                await _seriesService.DeleteSeriesAsync(id, mangakaId, isAdmin: false, ct);
+                await _seriesService.DeleteSeriesAsync(id, mangakaId.Value, isAdmin: false, ct);
                 TempData["Success"] = "Series deleted.";
             }
             catch (Exception ex)
@@ -132,10 +147,12 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Submit(Guid id, CancellationToken ct)
         {
+            var mangakaId = GetCurrentUserId();
+            if (mangakaId == null) return Unauthorized();
+
             try
             {
-                var mangakaId = GetCurrentUserId();
-                await _seriesService.SubmitSeriesAsync(id, mangakaId, ct);
+                await _seriesService.SubmitSeriesAsync(id, mangakaId.Value, ct);
                 TempData["Success"] = "Series submitted for board review.";
             }
             catch (Exception ex)
@@ -145,17 +162,18 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        private Guid GetCurrentUserId()
+        /// <summary>Returns current user ID from claims, or null if claim is missing/invalid.</summary>
+        private Guid? GetCurrentUserId()
         {
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.Parse(idClaim!);
+            return Guid.TryParse(idClaim, out var id) ? id : null;
         }
 
-        private void EnsureOwnsSeries(Guid mangakaId)
+        /// <summary>Returns true if the current user owns the given series.</summary>
+        private bool OwnsSeries(Guid mangakaId)
         {
             var currentUserId = GetCurrentUserId();
-            if (mangakaId != currentUserId)
-                throw new UnauthorizedAccessException("You do not own this series.");
+            return currentUserId.HasValue && mangakaId == currentUserId.Value;
         }
     }
 }

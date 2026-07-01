@@ -14,9 +14,7 @@ namespace MangaWorkflow.Application.Services
         }
 
         /// <summary>
-        /// Validates user credentials.
-        /// PRN222 Demo Mode: compares plain-text password stored in PasswordHash column.
-        /// TODO: Replace with BCrypt.Net-Next hashing before any production deployment.
+        /// Validates user credentials using BCrypt password verification.
         /// </summary>
         public async Task<User?> ValidateCredentialsAsync(string email, string password, CancellationToken ct = default)
         {
@@ -25,12 +23,23 @@ namespace MangaWorkflow.Application.Services
             if (user == null || !user.IsActive)
                 return null;
 
-            // Demo mode: plain-text password comparison
-            // The seed database stores plaintext passwords in PasswordHash for demo purposes
             if (user.PasswordHash == null)
                 return null;
 
-            bool isValid = user.PasswordHash == password;
+            // BCrypt verification — supports both hashed passwords and legacy plain-text (fallback)
+            bool isValid;
+            if (user.PasswordHash.StartsWith("$2"))
+            {
+                // Modern: BCrypt hash
+                isValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            }
+            else
+            {
+                // Legacy fallback for existing seed data plain-text passwords
+                // TODO: Force password reset or re-hash all seed data after migration
+                isValid = user.PasswordHash == password;
+            }
+
             return isValid ? user : null;
         }
     }

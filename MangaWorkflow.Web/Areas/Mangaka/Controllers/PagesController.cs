@@ -22,6 +22,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Pages?chapterId={id}
+        [HttpGet]
         public async Task<IActionResult> Index(Guid chapterId, CancellationToken ct)
         {
             var chapter = await _chapterService.GetChapterDetailAsync(chapterId, ct);
@@ -33,6 +34,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Pages/Details/{id}
+        [HttpGet]
         public async Task<IActionResult> Details(Guid id, CancellationToken ct)
         {
             var page = await _pageService.GetPageDetailAsync(id, ct);
@@ -41,6 +43,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Pages/Upload?chapterId={id}
+        [HttpGet]
         public async Task<IActionResult> Upload(Guid chapterId, CancellationToken ct)
         {
             var chapter = await _chapterService.GetChapterDetailAsync(chapterId, ct);
@@ -62,10 +65,12 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
                 return View(dto);
             }
 
+            var userId = GetCurrentUserId();
+            if (userId == null) return Unauthorized();
+
             try
             {
-                var userId = GetCurrentUserId();
-                await _pageService.CreatePageAsync(dto, userId, _env.WebRootPath, ct);
+                await _pageService.CreatePageAsync(dto, userId.Value, _env.WebRootPath, ct);
                 TempData["Success"] = $"Page {dto.PageNumber} uploaded.";
                 return RedirectToAction(nameof(Index), new { chapterId = dto.ChapterId });
             }
@@ -78,10 +83,11 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
             }
         }
 
-        private Guid GetCurrentUserId()
+        /// <summary>Returns current user ID from claims, or null if claim is missing/invalid.</summary>
+        private Guid? GetCurrentUserId()
         {
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.Parse(idClaim!);
+            return Guid.TryParse(idClaim, out var id) ? id : null;
         }
     }
 }
