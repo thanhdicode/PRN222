@@ -35,7 +35,14 @@ namespace MangaWorkflow.Application.Services
         public async Task SubmitTaskAsync(SubmitTaskDto dto, Guid assistantId, CancellationToken ct = default)
         {
             var task = await _taskRepo.GetWithDetailsAsync(dto.TaskId, ct);
-            if (task == null || task.AssignedToAssistantId != assistantId) return;
+
+            // Guard: task must exist and belong to the calling assistant
+            if (task == null || task.AssignedToAssistantId != assistantId)
+                return;
+
+            // Guard: only InProgress tasks can be submitted
+            if (task.TaskStatus?.StatusCode != "InProgress")
+                return;
 
             // Resolve SubmissionStatus by StatusCode — never hardcode IDs
             var submittedStatusId = await _submissionStatusRepo.GetIdByCodeAsync("Submitted", ct);
@@ -54,22 +61,12 @@ namespace MangaWorkflow.Application.Services
             await _submissionRepo.AddAsync(submission, ct);
             await _taskRepo.UpdateStatusAsync(dto.TaskId, "Submitted", ct);
 
-            // Notify Mangaka: prefer Series.MangakaId, fallback to SeriesTeamMembers role
+            // Notify Mangaka: use series.MangakaId directly (FK is always set)
             var series = task.Page?.Chapter?.Series;
-            Guid? mangakaId = null;
-            if (series != null)
-            {
-                if (series.MangakaId != Guid.Empty)
-                    mangakaId = series.MangakaId;
-                else
-                    mangakaId = series.SeriesTeamMembers
-                        .FirstOrDefault(tm => tm.RoleInSeries.Contains("Mangaka"))?.UserId;
-            }
-
-            if (mangakaId.HasValue)
+            if (series != null && series.MangakaId != Guid.Empty)
             {
                 await _notificationService.CreateAndSendAsync(
-                    mangakaId.Value,
+                    series.MangakaId,
                     "SubmissionUploaded",
                     "New Submission",
                     $"Task \"{task.Title}\" was submitted by an assistant.",
@@ -117,6 +114,10 @@ namespace MangaWorkflow.Application.Services
             var submission = await _submissionRepo.GetWithTaskAsync(dto.SubmissionId, ct);
             if (submission == null) return;
 
+            // Guard: only Submitted submissions can be reviewed
+            if (submission.SubmissionStatus?.StatusCode != "Submitted")
+                return;
+
             // Map decision → StatusCode
             string newStatusCode = dto.Decision switch
             {
@@ -134,6 +135,7 @@ namespace MangaWorkflow.Application.Services
 
             await _submissionRepo.UpdateAsync(submission, ct);
 
+            // Keep task status in sync with submission decision
             string taskStatusCode = dto.Decision switch
             {
                 "Approved" => "Approved",
@@ -142,6 +144,7 @@ namespace MangaWorkflow.Application.Services
             };
             await _taskRepo.UpdateStatusAsync(submission.TaskId, taskStatusCode, ct);
 
+            // Notify the assistant of the review outcome
             await _notificationService.CreateAndSendAsync(
                 submission.SubmittedByAssistantId,
                 "SubmissionReviewed",
