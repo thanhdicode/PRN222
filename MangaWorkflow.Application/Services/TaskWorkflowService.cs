@@ -56,6 +56,8 @@ namespace MangaWorkflow.Application.Services
                 StatusName = task.TaskStatus?.StatusName ?? "",
                 Deadline = task.Deadline,
                 PageId = task.PageId,
+                // B6 FIX: Map PageNumber so the view shows "Page 3" instead of raw UUID
+                PageNumber = task.Page?.PageNumber,
                 PageImageUrl = task.Page?.ImageUrl,
                 Instructions = task.Description,
                 AssignedToUserId = task.AssignedToAssistantId,
@@ -65,9 +67,13 @@ namespace MangaWorkflow.Application.Services
 
         public async Task StartTaskAsync(Guid taskId, Guid assistantId, CancellationToken ct = default)
         {
-            var task = await _taskRepo.GetByIdAsync(taskId, ct);
+            // B7 FIX: Use GetWithDetailsAsync (which includes TaskStatus navigation property)
+            // instead of GetByIdAsync (which uses FindAsync with no Include).
+            // Previously, TaskStatus navigation property was null because FindAsync does NOT
+            // load related entities — causing the guard check to always fail silently,
+            // meaning status was never updated to InProgress.
+            var task = await _taskRepo.GetWithDetailsAsync(taskId, ct);
 
-            // Guard: task must be assigned to this assistant and be in "Assigned" state
             if (task == null ||
                 task.AssignedToAssistantId != assistantId ||
                 task.TaskStatus?.StatusCode != "Assigned")

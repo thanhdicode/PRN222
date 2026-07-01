@@ -20,8 +20,18 @@
             <dt class="col-sm-3">Deadline</dt>
             <dd class="col-sm-9">@(Model.Deadline?.ToString("yyyy-MM-dd HH:mm") ?? "No deadline")</dd>
 
+            <%-- B6 FIX: Show human-readable "Page N" instead of raw UUID --%>
             <dt class="col-sm-3">Page</dt>
-            <dd class="col-sm-9">@Model.PageId</dd>
+            <dd class="col-sm-9">
+                @if (Model.PageNumber.HasValue)
+                {
+                    <span>Page @Model.PageNumber</span>
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </dd>
 
             <dt class="col-sm-3">Assigned To</dt>
             <dd class="col-sm-9">@(Model.AssignedToUserName ?? "Current assistant")</dd>

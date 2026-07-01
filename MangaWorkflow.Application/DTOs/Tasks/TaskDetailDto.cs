@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace MangaWorkflow.Application.DTOs.Tasks
 {
@@ -13,6 +13,8 @@ namespace MangaWorkflow.Application.DTOs.Tasks
         public DateTime? Deadline { get; set; }
         public bool IsOverdue => Deadline.HasValue && Deadline.Value < DateTime.UtcNow && StatusCode is not ("Approved" or "Rejected" or "Cancelled");
         public Guid PageId { get; set; }
+        // B6 FIX: Added PageNumber so the Detail view can show "Page 3" instead of raw UUID
+        public int? PageNumber { get; set; }
         public string? PageImageUrl { get; set; }
         public string? Instructions { get; set; }
         public Guid? AssignedToUserId { get; set; }
