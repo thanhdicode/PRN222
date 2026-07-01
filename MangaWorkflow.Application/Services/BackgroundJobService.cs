@@ -112,7 +112,7 @@ namespace MangaWorkflow.Application.Services
 
                     if (current.RankPosition - previous.RankPosition > 3)
                     {
-                        var newRiskScore = series.CancellationRiskScore + 10m;
+                        var newRiskScore = Math.Min(100m, series.CancellationRiskScore + 10m);
                         await _jobQueriesRepo.UpdateSeriesCancellationRiskAsync(series.SeriesId, newRiskScore, ct);
 
                         await _notificationService.CreateAndSendAsync(

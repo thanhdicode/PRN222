@@ -318,3 +318,20 @@ Completed: 2026-07-01
 - [x] `dotnet test` passes: 18/18.
 - [x] Browser automation verified `/Assistant/TaskInbox` has navbar, hero, 4 metric cards,
   task rows, Open/Submit actions, and SignalR proof block.
+
+---
+
+## Ranking Risk Worker Clamp Fix (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### What was fixed
+- [x] Clamped ranking risk increases at 100 before writing to `Series.CancellationRiskScore`.
+- [x] Added regression coverage for the `96 + 10` risk scenario so the Worker cannot write 106
+  and violate the database check constraint.
+
+### Verification
+- [x] Targeted test passes: `ProcessRankingRisksAsync_ClampsCancellationRiskScoreAt100`.
+- [x] `dotnet test` passes: 19/19.
+- [x] `dotnet build` passes with 0 errors.
