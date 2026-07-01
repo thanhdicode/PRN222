@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using MangaWorkflow.Application.Interfaces.Services;
 using MangaWorkflow.Application.Interfaces.Repositories;
 using MangaWorkflow.Application.DTOs.Tasks;
@@ -14,10 +13,14 @@ namespace MangaWorkflow.Application.Services
     public class TaskWorkflowService : ITaskWorkflowService
     {
         private readonly IProductionTaskRepository _taskRepo;
+        private readonly ITaskStatusRepository _taskStatusRepo;
 
-        public TaskWorkflowService(IProductionTaskRepository taskRepo)
+        public TaskWorkflowService(
+            IProductionTaskRepository taskRepo,
+            ITaskStatusRepository taskStatusRepo)
         {
             _taskRepo = taskRepo;
+            _taskStatusRepo = taskStatusRepo;
         }
 
         public async Task<List<TaskListItemDto>> GetAssistantTasksAsync(Guid assistantId, string? statusFilter, CancellationToken ct = default)
@@ -63,26 +66,27 @@ namespace MangaWorkflow.Application.Services
         public async Task StartTaskAsync(Guid taskId, Guid assistantId, CancellationToken ct = default)
         {
             var task = await _taskRepo.GetByIdAsync(taskId, ct);
-            if (task != null && task.AssignedToAssistantId == assistantId && task.TaskStatus.StatusCode == "Assigned")
-            {
-                await _taskRepo.UpdateStatusAsync(taskId, "InProgress", ct);
-            }
+
+            // Guard: task must be assigned to this assistant and be in "Assigned" state
+            if (task == null ||
+                task.AssignedToAssistantId != assistantId ||
+                task.TaskStatus?.StatusCode != "Assigned")
+                return;
+
+            await _taskRepo.UpdateStatusAsync(taskId, "InProgress", ct);
         }
 
-        public Task<List<TaskStatusOption>> GetTaskStatusOptionsAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Returns all task status options directly from the database — no hardcoded lists.
+        /// </summary>
+        public async Task<List<TaskStatusOption>> GetTaskStatusOptionsAsync(CancellationToken ct = default)
         {
-            // Just mocked for simplicity without creating a new repo method, usually from a TaskStatus lookup table
-            var list = new List<TaskStatusOption>
+            var statuses = await _taskStatusRepo.GetAllAsync(ct);
+            return statuses.Select(s => new TaskStatusOption
             {
-                new TaskStatusOption { StatusCode = "Assigned", StatusName = "Assigned" },
-                new TaskStatusOption { StatusCode = "InProgress", StatusName = "In Progress" },
-                new TaskStatusOption { StatusCode = "Submitted", StatusName = "Submitted" },
-                new TaskStatusOption { StatusCode = "Approved", StatusName = "Approved" },
-                new TaskStatusOption { StatusCode = "Rejected", StatusName = "Rejected" },
-                new TaskStatusOption { StatusCode = "RevisionRequired", StatusName = "Revision Required" },
-                new TaskStatusOption { StatusCode = "Overdue", StatusName = "Overdue" }
-            };
-            return Task.FromResult(list);
+                StatusCode = s.StatusCode,
+                StatusName = s.StatusName
+            }).ToList();
         }
 
         public async Task<List<TaskDeadlineReminderDto>> GetTasksDueWithinHoursAsync(int hours, CancellationToken ct = default)
@@ -93,7 +97,7 @@ namespace MangaWorkflow.Application.Services
                 TaskId = t.TaskId,
                 Title = t.Title,
                 AssignedToUserId = t.AssignedToAssistantId,
-                Deadline = t.Deadline.Value
+                Deadline = t.Deadline!.Value
             }).ToList();
         }
 
@@ -118,8 +122,3 @@ namespace MangaWorkflow.Application.Services
         }
     }
 }
-
-
-
-
-
