@@ -20,6 +20,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Chapters?seriesId={id}
+        [HttpGet]
         public async Task<IActionResult> Index(Guid seriesId, CancellationToken ct)
         {
             var series = await _seriesService.GetSeriesDetailAsync(seriesId, ct);
@@ -31,6 +32,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Chapters/Details/{id}
+        [HttpGet]
         public async Task<IActionResult> Details(Guid id, CancellationToken ct)
         {
             var chapter = await _chapterService.GetChapterDetailAsync(id, ct);
@@ -39,6 +41,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Chapters/Create?seriesId={id}
+        [HttpGet]
         public async Task<IActionResult> Create(Guid seriesId, CancellationToken ct)
         {
             var series = await _seriesService.GetSeriesDetailAsync(seriesId, ct);
@@ -76,6 +79,7 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
         }
 
         // GET /Mangaka/Chapters/Edit/{id}
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken ct)
         {
             var chapter = await _chapterService.GetChapterDetailAsync(id, ct);
@@ -130,6 +134,13 @@ namespace MangaWorkflow.Web.Areas.Mangaka.Controllers
                 TempData["Error"] = ex.Message;
             }
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        /// <summary>Returns current user ID from claims, or null if claim is missing/invalid.</summary>
+        private Guid? GetCurrentUserId()
+        {
+            var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(idClaim, out var id) ? id : null;
         }
     }
 }
