@@ -9,10 +9,17 @@ namespace MangaWorkflow.Application.Services
     public class SeriesService : ISeriesService
     {
         private readonly ISeriesRepository _seriesRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly INotificationService _notificationService;
 
-        public SeriesService(ISeriesRepository seriesRepository)
+        public SeriesService(
+            ISeriesRepository seriesRepository,
+            IUserRepository userRepository,
+            INotificationService notificationService)
         {
             _seriesRepository = seriesRepository;
+            _userRepository = userRepository;
+            _notificationService = notificationService;
         }
 
         // --- Phase 1 legacy methods ---
@@ -139,6 +146,27 @@ namespace MangaWorkflow.Application.Services
             series.SeriesStatusId = submittedStatus.SeriesStatusId;
             series.SubmittedAt = DateTime.UtcNow;
             await _seriesRepository.SaveChangesAsync(ct);
+
+            // Notify all Admin and EditorialBoard members about the new submission
+            var allUsers = await _userRepository.GetAllAsync(null, null, ct);
+            var reviewers = allUsers.Where(u =>
+                u.IsActive &&
+                u.UserRoles.Any(ur =>
+                    ur.Role.RoleCode == "Admin" ||
+                    ur.Role.RoleCode == "EditorialBoard")).ToList();
+
+            foreach (var reviewer in reviewers)
+            {
+                await _notificationService.CreateAndSendAsync(
+                    reviewer.UserId,
+                    "System",
+                    "New Series Submitted for Review",
+                    $"Series \"{series.Title}\" has been submitted by {series.Mangaka?.FullName ?? "a Mangaka"} and is awaiting board review.",
+                    "Series",
+                    seriesId,
+                    ct
+                );
+            }
         }
 
         public async Task<List<SeriesStatus>> GetStatusesAsync(CancellationToken ct = default)
@@ -162,4 +190,3 @@ namespace MangaWorkflow.Application.Services
         };
     }
 }
-
