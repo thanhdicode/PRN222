@@ -98,7 +98,7 @@ namespace MangaWorkflow.Web.Controllers
                 var pageOwnerSeriesId = page.Chapter?.SeriesId;
                 if (pageOwnerSeriesId.HasValue)
                 {
-                    var ownerSeries = await _seriesRepository.GetByIdAsync(pageOwnerSeriesId.Value);
+                    var ownerSeries = await _seriesRepository.GetByIdWithDetailsAsync(pageOwnerSeriesId.Value);
                     if (ownerSeries == null || ownerSeries.MangakaId != userId.Value)
                         return Forbid();
                 }

@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MangaWorkflow.Application\MangaWorkflow.Application.csproj" />
     <ProjectReference Include="..\MangaWorkflow.Infrastructure\MangaWorkflow.Infrastructure.csproj" />
+    <ProjectReference Include="..\MangaWorkflow.Web\MangaWorkflow.Web.csproj" />
   </ItemGroup>
 
 </Project>

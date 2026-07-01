@@ -1,0 +1,41 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userName = User?.Identity?.Name;
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom pb-3 mb-4">
+        <div>
+            <h1 class="h4 mb-1">Assistant Workspace</h1>
+            <div class="text-muted small">
+                @(string.IsNullOrWhiteSpace(userName) ? "Signed in assistant" : userName)
+                <span class="badge bg-primary ms-2">Assistant</span>
+            </div>
+        </div>
+        <nav class="nav nav-pills">
+            <a class="nav-link" asp-area="Assistant" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+            <a class="nav-link" asp-area="Assistant" asp-controller="Tasks" asp-action="Index">My Tasks</a>
+            <a class="nav-link" asp-area="Assistant" asp-controller="Tasks" asp-action="Index" asp-route-status="InProgress">Submit Work</a>
+        </nav>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @RenderBody()
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)

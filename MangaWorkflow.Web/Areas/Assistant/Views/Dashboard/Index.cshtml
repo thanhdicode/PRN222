@@ -1,0 +1,60 @@
+@model List<TaskListItemDto>
+@{
+    ViewData["Title"] = "Assistant Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Active Tasks</h2>
+    <a class="btn btn-outline-primary btn-sm" asp-area="Assistant" asp-controller="Tasks" asp-action="Index">View All Tasks</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No active tasks are assigned right now.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Task Title</th>
+                    <th>Type</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="fw-semibold">@task.Title</div>
+                        <div class="text-muted small">@task.SeriesTitle @if (task.PageNumber.HasValue) { <span> / Page @task.PageNumber</span> }</div>
+                    </td>
+                    <td>@(string.IsNullOrWhiteSpace(task.TypeName) ? task.TypeCode : task.TypeName)</td>
+                    <td>@(task.Deadline?.ToString("yyyy-MM-dd HH:mm") ?? "No deadline")</td>
+                    <td><span class="badge bg-@StatusBadge(task.StatusCode)">@task.StatusName</span></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-area="Assistant" asp-controller="Tasks" asp-action="Detail" asp-route-id="@task.TaskId">Open</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@functions {
+    private static string StatusBadge(string statusCode) => statusCode switch
+    {
+        "Assigned" => "secondary",
+        "InProgress" => "primary",
+        "Submitted" => "info",
+        "Approved" => "success",
+        "Rejected" => "danger",
+        "Overdue" => "warning text-dark",
+        _ => "light text-dark"
+    };
+}

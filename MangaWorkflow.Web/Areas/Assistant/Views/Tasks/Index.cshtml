@@ -1,0 +1,74 @@
+@model List<TaskListItemDto>
+@{
+    ViewData["Title"] = "My Tasks";
+    var selectedStatus = ViewData["StatusFilter"] as string;
+    var statusOptions = ViewData["StatusOptions"] as List<TaskStatusOption> ?? new List<TaskStatusOption>();
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h2 class="h5 mb-0">My Tasks</h2>
+    <form method="get" class="d-flex gap-2">
+        <select name="status" class="form-select form-select-sm">
+            <option value="">All statuses</option>
+            @foreach (var status in statusOptions)
+            {
+                <option value="@status.StatusCode" selected="@(status.StatusCode == selectedStatus)">
+                    @status.StatusName
+                </option>
+            }
+        </select>
+        <button type="submit" class="btn btn-sm btn-outline-primary">Filter</button>
+        <a class="btn btn-sm btn-link" asp-area="Assistant" asp-controller="Tasks" asp-action="Index">Clear</a>
+    </form>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No tasks match the current filter.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Type</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var task in Model)
+            {
+                <tr>
+                    <td>
+                        <a class="fw-semibold text-decoration-none" asp-area="Assistant" asp-controller="Tasks" asp-action="Detail" asp-route-id="@task.TaskId">@task.Title</a>
+                        <div class="text-muted small">@task.SeriesTitle @if (task.PageNumber.HasValue) { <span> / Page @task.PageNumber</span> }</div>
+                    </td>
+                    <td>@(string.IsNullOrWhiteSpace(task.TypeName) ? task.TypeCode : task.TypeName)</td>
+                    <td>@(task.Deadline?.ToString("yyyy-MM-dd HH:mm") ?? "No deadline")</td>
+                    <td><span class="badge bg-@StatusBadge(task.StatusCode)">@task.StatusName</span></td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-area="Assistant" asp-controller="Tasks" asp-action="Detail" asp-route-id="@task.TaskId">Detail</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@functions {
+    private static string StatusBadge(string statusCode) => statusCode switch
+    {
+        "Assigned" => "secondary",
+        "InProgress" => "primary",
+        "Submitted" => "info",
+        "Approved" => "success",
+        "Rejected" => "danger",
+        "Overdue" => "warning text-dark",
+        _ => "light text-dark"
+    };
+}

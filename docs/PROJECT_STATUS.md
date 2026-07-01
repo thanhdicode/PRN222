@@ -210,3 +210,47 @@ architectural issues. See `docs/specs/AI_STUDIO_V1_STABILIZATION_SPEC.md`.
 - ✅ `dotnet test` — 16/16 passed (1 MockAiVisionClient + 15 AiStudioService)
 - ✅ All 10 AI Studio tasks complete and merge-ready
 
+---
+
+## SET 1 Local Stabilization (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### Tasks completed
+- [x] Added and committed `docs/specs/2026-07-01-set1-runnable-testable-design.md` before implementation.
+- [x] Fixed build error in `AiStudioController` by using existing `ISeriesRepository.GetByIdWithDetailsAsync`.
+- [x] Added Assistant MVC views for Dashboard, Tasks Index/Detail, and Submission upload.
+- [x] Added Assistant `_ViewImports.cshtml`, functional `_ViewStart.cshtml`, and checklist `_ViewStart.cshtml` under Shared.
+- [x] Verified `SubmitTaskDto` and `ITaskWorkflowService` methods used by Assistant controllers already exist.
+- [x] Added file-storage handling to Assistant MVC submission upload before calling `ISubmissionService`.
+- [x] Added idempotent `Database/seed_notification_types_v2.sql`.
+- [x] Verified Area controller authorization attributes are present.
+
+### Tests added
+- [x] `AiStudioControllerTests.Analyze_AllowsMangakaOwnedPageUsingExistingSeriesLookup`
+- [x] `AssistantSubmissionsControllerTests.Submit_SavesUploadedFileBeforeCallingSubmissionService`
+
+### Commands run
+- `git pull`
+- `dotnet test MangaWorkflow.Tests\MangaWorkflow.Tests.csproj --filter Analyze_AllowsMangakaOwnedPageUsingExistingSeriesLookup`
+- `dotnet test MangaWorkflow.Tests\MangaWorkflow.Tests.csproj --filter Submit_SavesUploadedFileBeforeCallingSubmissionService`
+- `dotnet test`
+- `dotnet build`
+- `dotnet run --project MangaWorkflow.Tools.DbSmokeTest`
+- `dotnet run --project MangaWorkflow.Web --urls http://localhost:5128`
+- `curl.exe -i http://localhost:5128/Auth/Login`
+- `curl.exe -i --max-redirs 0 http://localhost:5128/Assistant/Tasks`
+- `curl.exe -i --max-redirs 0 http://localhost:5128/Assistant/Dashboard`
+- `sqlcmd -S . -d MangaWorkflowDB -E -Q "<AuditLogs LoginFailed verification query>"`
+
+### Verification
+- [x] `dotnet build` passes with 0 errors.
+- [x] `dotnet test` passes: 18/18.
+- [x] `DbSmokeTest` passes against local SQL Server.
+- [x] `/Auth/Login` returns 200 OK.
+- [x] `/Assistant/Tasks` and `/Assistant/Dashboard` redirect unauthenticated users to `/Auth/Login`, confirming routes exist and authorization is active.
+- [x] Wrong login POST creates a `LoginFailed` row in `AuditLogs`.
+
+### Known issues
+- NuGet vulnerability warnings remain for `NuGet.Packaging` and `NuGet.Protocol`; they existed before this stabilization and do not block compilation.
