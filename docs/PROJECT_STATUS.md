@@ -254,3 +254,44 @@ Completed: 2026-07-01
 
 ### Known issues
 - NuGet vulnerability warnings remain for `NuGet.Packaging` and `NuGet.Protocol`; they existed before this stabilization and do not block compilation.
+---
+
+## Full Demo Showcase Seed (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### What was added
+- [x] Created `Database/seed_demo_showcase_full.sql`.
+- [x] Seeded rich demo data into local `MangaWorkflowDB`.
+- [x] Added 6 showcase series with full cover image URLs:
+  `Neon Ronin Academy`, `Moonlit Bento Detective`, `Azure Dragon Courier`,
+  `Clockwork Sakura Atelier`, `Paper Lantern Ghosts`, `Signal Star Cafe`.
+- [x] Added chapters, manga pages, page thumbnails, page regions, production tasks,
+  task submissions, editor comments, board votes, rankings, reader votes,
+  publication issues, chapter publications, notifications, background job logs,
+  workflow history, and AI Studio demo records.
+- [x] Added missing notification type rows used by auth, board, task, SignalR, and worker demos.
+- [x] Updated demo user avatar URLs.
+
+### Commands run
+- `sqlcmd -S . -d MangaWorkflowDB -E -b -i Database\seed_demo_showcase_full.sql`
+- `sqlcmd -S . -d MangaWorkflowDB -E -Q "<showcase verification queries>"`
+- `curl.exe -s -o NUL -w "AuthLogin=%{http_code}\n" http://localhost:5128/Auth/Login`
+- `curl.exe -s -o NUL -w "AssistantTasks=%{http_code}\n" -L http://localhost:5128/Assistant/Tasks`
+- `curl.exe -s -o NUL -w "BoardReviewGuest=%{http_code}\n" -L http://localhost:5128/Board/Review`
+
+### Verification
+- [x] Seed script completed successfully in one transaction.
+- [x] Local DB now has at least 13 series, 16 chapters, 24 manga pages, 21 page regions,
+  19 production tasks, 9 task submissions, 13 ranking records, and 47 notifications.
+- [x] Showcase series and manga pages have full remote image URLs.
+- [x] Series statuses now cover Draft, Submitted, UnderReview, Approved, Publishing,
+  RevisionRequired, and Cancelled for demo variety.
+- [x] Task statuses now cover Assigned, InProgress, Submitted, Approved, Rejected,
+  Overdue, and Cancelled for workflow demos.
+- [x] GET smoke checks for login, Assistant tasks, and Board review succeeded.
+
+### Next recommended demo action
+- Refresh the browser and login as each role to demo populated dashboards, list screens,
+  Assistant task workflow, Board review, ranking screens, notifications, and Worker logs.
