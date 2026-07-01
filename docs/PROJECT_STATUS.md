@@ -157,7 +157,7 @@ PRN222: Chapter 08 Worker Service
 ## Known Issues / Demo Limitations
 
 - **.NET Versioning**: The solution targets `.NET 10.0` (Preview) and requires the corresponding `.NET 10.0` SDK/Runtime to be installed on the demonstration machine.
-- **Authentication**: Authentication uses demo-mode plaintext password comparison for simplicity during the demonstration and is NOT suitable for production security.
+- **Authentication**: Seeded demo users use BCrypt password hashes. The shared demo password for every role is `test123@`.
 
 ---
 
@@ -357,3 +357,22 @@ Completed: 2026-07-01
 - [x] `dotnet test` passes: 19/19.
 - [x] Browser automation login as `mangaka@manga.local` reaches `/Mangaka/Dashboard`
   with 4 metric cards, 6 recent series cards, 6 cover images, and no HTTP 500 responses.
+
+---
+
+## Unified Demo Password Hashes (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### What was changed
+- [x] Changed all local demo users to the shared password `test123@`.
+- [x] Stored the password as BCrypt hashes in SQL Server and seed scripts.
+- [x] Updated README and demo docs to use `test123@`.
+- [x] Fixed Board review index model binding so EditorialBoard users can land on `/Board/Review` after login.
+
+### Verification
+- [x] Local DB has 11 users with `$2a$12$` BCrypt hashes, length 60.
+- [x] Browser automation verified all 11 demo accounts login with `test123@` and reach their role landing pages without HTTP 500.
+- [x] `dotnet build` passes with 0 errors.
+- [x] `dotnet test` passes: 19/19.

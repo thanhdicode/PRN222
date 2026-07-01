@@ -1,7 +1,7 @@
-# MASTER AGENT PLAN — PRN222 MangaWorkflow System
+# MASTER AGENT PLAN â€” PRN222 MangaWorkflow System
 
 **Project**: Manga Creation Workflow and Publishing Management System
-**Course**: PRN222 — Advanced Cross-Platform Application Programming With .NET
+**Course**: PRN222 â€” Advanced Cross-Platform Application Programming With .NET
 **Architecture**: Domain / Application / Infrastructure / Web / Worker / Tools.DbSmokeTest
 **Last Updated**: 2026-06-26
 **Status**: Phase 1 Complete ? | Phase 2 Next ?
@@ -46,14 +46,14 @@ The project MUST be built in chapter order because each phase proves a specific 
 
 ---
 
-## Phase 1 — Foundation (COMPLETE ?)
+## Phase 1 â€” Foundation (COMPLETE ?)
 
 ### What was proven
 PRN222 Ch01-Ch03: .NET project structure, EF Core database-first scaffold, Dependency Injection, async/await pattern
 
 ### What was built
 - 6-project solution: Domain, Application, Infrastructure, Web, Worker, Tools.DbSmokeTest
-- EF Core database-first scaffold — entities in MangaWorkflow.Domain/Entities/
+- EF Core database-first scaffold â€” entities in MangaWorkflow.Domain/Entities/
 - MangaWorkflowDbContext in MangaWorkflow.Infrastructure/Persistence/
 - Repository interfaces in MangaWorkflow.Application/Interfaces/Repositories/
 - Repository implementations in MangaWorkflow.Infrastructure/Repositories/
@@ -74,16 +74,16 @@ PRN222 Ch01-Ch03: .NET project structure, EF Core database-first scaffold, Depen
 
 ---
 
-## Phase 2 — ASP.NET Core MVC CRUD (NEXT ?)
+## Phase 2 â€” ASP.NET Core MVC CRUD (NEXT ?)
 
 ### PRN222 Chapter Proven
-Chapter 04: ASP.NET Core MVC — controllers, views, model binding, validation, filters, areas, role authorization
+Chapter 04: ASP.NET Core MVC â€” controllers, views, model binding, validation, filters, areas, role authorization
 
 ### Scope Summary
 Build all MVC management screens inside Areas:
-- Areas/Admin — User and Role management
-- Areas/Mangaka — Series, Chapter, Manga Page CRUD
-- Areas/Board — Series voting review + Reader ranking management
+- Areas/Admin â€” User and Role management
+- Areas/Mangaka â€” Series, Chapter, Manga Page CRUD
+- Areas/Board â€” Series voting review + Reader ranking management
 
 ### Must NOT do in Phase 2
 - No Razor Pages workflow screens (Phase 3)
@@ -97,28 +97,28 @@ See docs/PHASE_2_MVC_CRUD_PLAN.md
 ### Completion criteria
 - Build passes, DbSmokeTest passes
 - All Areas render without errors
-- Full Mangaka create series — submit — Board vote flow works
+- Full Mangaka create series â€” submit â€” Board vote flow works
 - docs/PROJECT_STATUS.md updated with [DONE] Phase 2
 - docs/PHASE_2_COMPLETION_REPORT.md created
 
 ---
 
-## Phase 3 — Razor Pages Workflow Screens
+## Phase 3 â€” Razor Pages Workflow Screens
 
 ### PRN222 Chapter Proven
-Chapter 05: Razor Pages — PageModel, OnGetAsync, OnPostAsync, handler methods, TempData, form validation
+Chapter 05: Razor Pages â€” PageModel, OnGetAsync, OnPostAsync, handler methods, TempData, form validation
 
 ### Scope Summary
-- Pages/Assistant/ — Task inbox, task detail, submission upload
-- Pages/Mangaka/ — Submission review, page region management
-- Pages/Editor/ — Page comments and annotation
+- Pages/Assistant/ â€” Task inbox, task detail, submission upload
+- Pages/Mangaka/ â€” Submission review, page region management
+- Pages/Editor/ â€” Page comments and annotation
 
 ### Full detail
 See docs/PHASE_3_RAZOR_PAGES_WORKFLOW_PLAN.md
 
 ---
 
-## Phase 4 — Blazor Dashboard + SignalR Realtime
+## Phase 4 â€” Blazor Dashboard + SignalR Realtime
 
 ### PRN222 Chapters Proven
 - Chapter 06: Blazor Server
@@ -135,7 +135,7 @@ See docs/PHASE_4_BLAZOR_SIGNALR_PLAN.md
 
 ---
 
-## Phase 5 — Worker Service + Final Integration + Demo
+## Phase 5 â€” Worker Service + Final Integration + Demo
 
 ### PRN222 Chapter Proven
 Chapter 08: Worker Service (BackgroundService)
@@ -155,12 +155,12 @@ See docs/PHASE_5_WORKER_FINAL_DEMO_PLAN.md
 
 ## Architecture Invariants (Never Violate)
 
-MangaWorkflow.Domain — no references to other projects
-MangaWorkflow.Application — references Domain only, no DbContext access
-MangaWorkflow.Infrastructure — references Domain + Application, implements interfaces
-MangaWorkflow.Web — references all, Controllers/PageModels call Services only
-MangaWorkflow.Worker — references all, workers use DI scope + services
-MangaWorkflow.Tools.DbSmokeTest — references Domain + Infrastructure only
+MangaWorkflow.Domain â€” no references to other projects
+MangaWorkflow.Application â€” references Domain only, no DbContext access
+MangaWorkflow.Infrastructure â€” references Domain + Application, implements interfaces
+MangaWorkflow.Web â€” references all, Controllers/PageModels call Services only
+MangaWorkflow.Worker â€” references all, workers use DI scope + services
+MangaWorkflow.Tools.DbSmokeTest â€” references Domain + Infrastructure only
 
 ---
 
@@ -186,11 +186,13 @@ dotnet run --project MangaWorkflow.Worker   # Phase 5 only
 
 ## Demo Accounts
 
-admin@manga.local        — Admin
-mangaka@manga.local      — Mangaka
-assistant@manga.local    — Assistant
-editor@manga.local       — Editor (Tantou)
-board@manga.local        — EditorialBoard
+admin@manga.local        â€” Admin
+mangaka@manga.local      â€” Mangaka
+assistant@manga.local    â€” Assistant
+editor@manga.local       â€” Editor (Tantou)
+board@manga.local        â€” EditorialBoard
+
+Password for all demo accounts: `test123@`.
 
 ---
 
@@ -198,8 +200,8 @@ board@manga.local        — EditorialBoard
 
 | File | Purpose |
 |---|---|
-| AGENTS.md | Global AI agent rules — read first |
-| docs/MASTER_AGENT_PLAN.md | This file — overall phase plan |
+| AGENTS.md | Global AI agent rules â€” read first |
+| docs/MASTER_AGENT_PLAN.md | This file â€” overall phase plan |
 | docs/AI_AGENT_EXECUTION_RULES.md | Hard rules for every coding agent |
 | docs/PHASE_2_MVC_CRUD_PLAN.md | Detailed Phase 2 implementation guide |
 | docs/PHASE_3_RAZOR_PAGES_WORKFLOW_PLAN.md | Detailed Phase 3 guide |

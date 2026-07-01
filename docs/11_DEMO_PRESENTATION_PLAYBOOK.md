@@ -30,6 +30,8 @@ board2@manga.local
 board3@manga.local
 ```
 
+Password for every demo account: `test123@`.
+
 ## Demo flow
 
 ### Step 1 — Explain technology map

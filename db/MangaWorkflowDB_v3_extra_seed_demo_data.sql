@@ -162,12 +162,12 @@ BEGIN TRY
 
     INSERT INTO dbo.Users (UserId, FullName, Email, PasswordHash, AvatarUrl, CreatedAt)
     VALUES
-    (@Mangaka2Id, N'Riku Mori', N'mangaka2@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/riku-mori.png', DATEADD(DAY, -40, @Now)),
-    (@Assistant2Id, N'Yuna Ito', N'assistant2@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/yuna-ito.png', DATEADD(DAY, -36, @Now)),
-    (@Assistant3Id, N'Daichi Noda', N'assistant3@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/daichi-noda.png', DATEADD(DAY, -18, @Now)),
-    (@Editor2Id, N'Haruka Editor', N'editor2@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/haruka-editor.png', DATEADD(DAY, -35, @Now)),
-    (@Board2Id, N'Board Member 02', N'board2@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/board-02.png', DATEADD(DAY, -34, @Now)),
-    (@Board3Id, N'Board Member 03', N'board3@manga.local', N'DEMO_HASH_CHANGE_IN_APP', N'/demo/avatars/board-03.png', DATEADD(DAY, -33, @Now));
+    (@Mangaka2Id, N'Riku Mori', N'mangaka2@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/riku-mori.png', DATEADD(DAY, -40, @Now)),
+    (@Assistant2Id, N'Yuna Ito', N'assistant2@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/yuna-ito.png', DATEADD(DAY, -36, @Now)),
+    (@Assistant3Id, N'Daichi Noda', N'assistant3@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/daichi-noda.png', DATEADD(DAY, -18, @Now)),
+    (@Editor2Id, N'Haruka Editor', N'editor2@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/haruka-editor.png', DATEADD(DAY, -35, @Now)),
+    (@Board2Id, N'Board Member 02', N'board2@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/board-02.png', DATEADD(DAY, -34, @Now)),
+    (@Board3Id, N'Board Member 03', N'board3@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m', N'/demo/avatars/board-03.png', DATEADD(DAY, -33, @Now));
 
     INSERT INTO dbo.UserRoles (UserId, RoleId)
     VALUES

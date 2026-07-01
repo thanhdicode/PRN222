@@ -66,7 +66,7 @@ dotnet run --project MangaWorkflow.Worker
 | editor@manga.local | Editor (Tantou) | Page annotation |
 | board@manga.local | EditorialBoard | Series voting and ranking |
 
-Passwords: See database seed data. Demo mode uses stored passwords.
+Password for all demo accounts: `test123@` (stored as BCrypt hashes in seed data).
 
 ---
 

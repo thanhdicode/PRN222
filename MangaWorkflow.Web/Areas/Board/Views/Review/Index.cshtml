@@ -1,4 +1,4 @@
-@model List<MangaWorkflow.Application.DTOs.Series.SeriesListItemDto>
+@model List<MangaWorkflow.Application.DTOs.Board.BoardSeriesListItemDto>
 @{
     ViewData["Title"] = "Editorial Board Review";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,10 +25,20 @@
                 <a asp-action="Details" asp-route-id="@series.SeriesId" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex w-100 justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <div class="bg-light rounded me-3 d-flex justify-content-center align-items-center text-muted" style="width: 50px; height: 50px;">Img</div>
+                            <div class="bg-light rounded me-3 d-flex justify-content-center align-items-center text-muted overflow-hidden" style="width: 64px; height: 64px;">
+                                @if (!string.IsNullOrWhiteSpace(series.CoverImageUrl))
+                                {
+                                    <img src="@series.CoverImageUrl" alt="@series.Title cover" class="w-100 h-100 object-fit-cover" />
+                                }
+                                else
+                                {
+                                    <span>Img</span>
+                                }
+                            </div>
                             <div>
                                 <h5 class="mb-1">@series.Title</h5>
-                                <p class="mb-1 text-muted small">@series.Genre | Submitted: @series.CreatedAt.ToString("d")</p>
+                                <p class="mb-1 text-muted small">@series.Genre | @series.MangakaName | Submitted: @series.SubmittedAt?.ToString("d")</p>
+                                <p class="mb-0 text-muted small">@series.VoteCount vote(s) recorded</p>
                             </div>
                         </div>
                         <span class="badge bg-info">@series.StatusName</span>

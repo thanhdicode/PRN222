@@ -793,7 +793,8 @@ GO
 
 /* ============================================================
    7. OPTIONAL SAMPLE USERS FOR DEVELOPMENT
-   PasswordHash is placeholder. Replace with real hash in application.
+   Password for all seeded accounts: test123@.
+   PasswordHash values are BCrypt hashes, not plaintext.
    ============================================================ */
 
 DECLARE @AdminId UNIQUEIDENTIFIER = NEWID();
@@ -804,11 +805,11 @@ DECLARE @BoardId UNIQUEIDENTIFIER = NEWID();
 
 INSERT INTO dbo.Users (UserId, FullName, Email, PasswordHash)
 VALUES
-(@AdminId, N'Admin User', N'admin@manga.local', N'DEMO_HASH_CHANGE_IN_APP'),
-(@MangakaId, N'Aki Tanaka', N'mangaka@manga.local', N'DEMO_HASH_CHANGE_IN_APP'),
-(@AssistantId, N'Mina Sato', N'assistant@manga.local', N'DEMO_HASH_CHANGE_IN_APP'),
-(@EditorId, N'Kobayashi Editor', N'editor@manga.local', N'DEMO_HASH_CHANGE_IN_APP'),
-(@BoardId, N'Board Member 01', N'board@manga.local', N'DEMO_HASH_CHANGE_IN_APP');
+(@AdminId, N'Admin User', N'admin@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m'),
+(@MangakaId, N'Aki Tanaka', N'mangaka@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m'),
+(@AssistantId, N'Mina Sato', N'assistant@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m'),
+(@EditorId, N'Kobayashi Editor', N'editor@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m'),
+(@BoardId, N'Board Member 01', N'board@manga.local', N'$2a$12$Rwo5eRb9x0E/6Q9MUw1OcuwhQwT4lNIprqDIZfSU6l/B3jEg7Ve2m');
 
 INSERT INTO dbo.UserRoles (UserId, RoleId)
 SELECT @AdminId, RoleId FROM dbo.Roles WHERE RoleCode = 'Admin'

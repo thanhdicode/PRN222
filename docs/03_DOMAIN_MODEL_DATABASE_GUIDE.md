@@ -76,7 +76,7 @@ board2@manga.local
 board3@manga.local
 ```
 
-Password hashes are placeholders. Implement simple demo login or replace them with real password hashing.
+Password for every seeded demo account is `test123@`. The database stores BCrypt hashes, not plaintext passwords.
 
 ### Core manga tables
 
