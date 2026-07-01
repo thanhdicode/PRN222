@@ -49,6 +49,9 @@ namespace MangaWorkflow.Infrastructure
             services.AddScoped<IAiDetectedRegionRepository, AiDetectedRegionRepository>();
             services.AddScoped<IAiTaskSuggestionRepository, AiTaskSuggestionRepository>();
 
+            // Audit Log repository
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+
             // Phase 5 AI configuration
             services.Configure<AiVisionOptions>(configuration.GetSection("AI"));
 
@@ -57,7 +60,7 @@ namespace MangaWorkflow.Infrastructure
             {
                 var aiBaseUrl = configuration["AI:BaseUrl"] ?? "http://localhost:8001";
                 client.BaseAddress = new System.Uri(aiBaseUrl);
-                
+
                 var timeoutSeconds = configuration.GetValue<int>("AI:TimeoutSeconds", 60);
                 client.Timeout = System.TimeSpan.FromSeconds(timeoutSeconds);
             });
@@ -66,4 +69,3 @@ namespace MangaWorkflow.Infrastructure
         }
     }
 }
-

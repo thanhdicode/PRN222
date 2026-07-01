@@ -35,8 +35,10 @@ namespace MangaWorkflow.Application
             // Phase 5 AI services
             services.AddScoped<IAiStudioService, AiStudioService>();
 
+            // Audit log service
+            services.AddScoped<IAuditLogService, AuditLogService>();
+
             return services;
         }
     }
 }
-
