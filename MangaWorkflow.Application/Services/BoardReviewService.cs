@@ -8,6 +8,10 @@ namespace MangaWorkflow.Application.Services
 {
     public class BoardReviewService : IBoardReviewService
     {
+        // Minimum votes for a decision to be finalised automatically.
+        // SET 1 does not fix an exact number, so we use 3 as a safe default.
+        private const int VoteThreshold = 3;
+
         private readonly ISeriesRepository _seriesRepository;
         private readonly IBoardVoteRepository _voteRepository;
         private readonly INotificationService _notificationService;
@@ -75,16 +79,15 @@ namespace MangaWorkflow.Application.Services
 
         public async Task SubmitVoteAsync(SubmitVoteDto dto, Guid boardMemberId, CancellationToken ct = default)
         {
-            // Check for duplicate vote
+            // Guard: duplicate vote
             var existingVote = await _voteRepository.GetExistingVoteAsync(dto.SeriesId, boardMemberId, ct);
             if (existingVote != null)
                 throw new InvalidOperationException("You have already voted on this series.");
 
-            // Get vote value from DB by code (never hardcode ID)
+            // Resolve vote value from DB by code — never hardcode IDs
             var voteValues = await _voteRepository.GetVoteValuesAsync(ct);
-            var voteValue = voteValues.FirstOrDefault(v => v.VoteCode == dto.VoteValueCode);
-            if (voteValue == null)
-                throw new InvalidOperationException($"Invalid vote value code: {dto.VoteValueCode}");
+            var voteValue = voteValues.FirstOrDefault(v => v.VoteCode == dto.VoteValueCode)
+                ?? throw new InvalidOperationException($"Invalid vote value code: {dto.VoteValueCode}");
 
             var vote = new BoardVote
             {
@@ -99,8 +102,11 @@ namespace MangaWorkflow.Application.Services
             await _voteRepository.AddAsync(vote, ct);
             await _voteRepository.SaveChangesAsync(ct);
 
-            // Insert notification for the series Mangaka
+            // Notify Mangaka a vote was cast
             await InsertVoteNotificationAsync(dto.SeriesId, boardMemberId, dto.VoteValueCode, ct);
+
+            // Check if enough votes have accumulated to auto-finalise the series
+            await TryFinaliseSeriesAsync(dto.SeriesId, ct);
         }
 
         public async Task<VoteSummaryDto> GetVoteSummaryAsync(Guid seriesId, CancellationToken ct = default)
@@ -116,9 +122,87 @@ namespace MangaWorkflow.Application.Services
             };
         }
 
+        // -----------------------------------------------------------------------
+        // Private helpers
+        // -----------------------------------------------------------------------
+
+        /// <summary>
+        /// After each vote, check whether a majority decision has been reached and
+        /// update the Series status + notify the Mangaka accordingly.
+        /// </summary>
+        private async Task TryFinaliseSeriesAsync(Guid seriesId, CancellationToken ct)
+        {
+            var series = await _seriesRepository.GetByIdWithDetailsAsync(seriesId, ct);
+            if (series == null) return;
+
+            // Only auto-finalise a series that is still under review (Submitted or UnderReview)
+            var currentCode = series.SeriesStatus?.StatusCode;
+            if (currentCode != SeriesStatusCodes.Submitted && currentCode != SeriesStatusCodes.UnderReview)
+                return;
+
+            var votes = await _voteRepository.GetBySeriesAsync(seriesId, ct);
+            int approveCount = votes.Count(v => v.VoteValue?.VoteCode == "Approve");
+            int rejectCount  = votes.Count(v => v.VoteValue?.VoteCode == "Reject");
+
+            string? newStatusCode = null;
+            string notificationTypeCode;
+            string notificationTitle;
+            string notificationMessage;
+
+            if (approveCount >= VoteThreshold)
+            {
+                newStatusCode = SeriesStatusCodes.Approved;
+                notificationTypeCode = NotificationTypeCodes.SeriesApproved;
+                notificationTitle = "Your Series Has Been Approved!";
+                notificationMessage = $"Congratulations! Your series \"{series.Title}\" has been approved by the editorial board.";
+            }
+            else if (rejectCount >= VoteThreshold)
+            {
+                newStatusCode = SeriesStatusCodes.Rejected;
+                notificationTypeCode = NotificationTypeCodes.SeriesRejected;
+                notificationTitle = "Your Series Has Been Rejected";
+                notificationMessage = $"We're sorry. Your series \"{series.Title}\" has been rejected by the editorial board.";
+            }
+            else
+            {
+                // Not yet enough votes for a decision — update to UnderReview if still Submitted
+                if (currentCode == SeriesStatusCodes.Submitted)
+                {
+                    var statuses = await _seriesRepository.GetAllStatusesAsync(ct);
+                    var underReviewStatus = statuses.FirstOrDefault(s => s.StatusCode == SeriesStatusCodes.UnderReview);
+                    if (underReviewStatus != null)
+                    {
+                        series.SeriesStatusId = underReviewStatus.SeriesStatusId;
+                        await _seriesRepository.SaveChangesAsync(ct);
+                    }
+                }
+                return;
+            }
+
+            // Apply final decision
+            var allStatuses = await _seriesRepository.GetAllStatusesAsync(ct);
+            var finalStatus = allStatuses.First(s => s.StatusCode == newStatusCode);
+            series.SeriesStatusId = finalStatus.SeriesStatusId;
+
+            if (newStatusCode == SeriesStatusCodes.Approved)
+                series.ApprovedAt = DateTime.UtcNow;
+
+            await _seriesRepository.SaveChangesAsync(ct);
+
+            // Notify Mangaka of the final decision
+            await _notificationService.CreateAndSendAsync(
+                series.MangakaId,
+                notificationTypeCode,
+                notificationTitle,
+                notificationMessage,
+                "Series",
+                seriesId,
+                ct
+            );
+        }
+
         private async Task InsertVoteNotificationAsync(Guid seriesId, Guid boardMemberId, string voteCode, CancellationToken ct)
         {
-            // Get series to find Mangaka
             var series = await _seriesRepository.GetByIdWithDetailsAsync(seriesId, ct);
             if (series == null) return;
 
