@@ -22,9 +22,16 @@ public class HomeController : Controller
         return View();
     }
 
+    // B9 FIX: Handle HTTP status codes (404, 403, 500, etc.) with a friendly page
+    // Called by UseStatusCodePagesWithReExecute in Program.cs
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Error(int? statusCode)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        var model = new ErrorViewModel
+        {
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+            StatusCode = statusCode
+        };
+        return View(model);
     }
 }

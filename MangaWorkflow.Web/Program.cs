@@ -51,6 +51,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// B9 FIX: Custom status code pages (404, 403, etc.) — shows friendly error page
+// instead of browser's default error page for HTTP error responses
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -74,4 +78,3 @@ app.MapHub<MangaWorkflow.Web.Hubs.NotificationHub>("/hubs/notifications");
 app.MapHub<MangaWorkflow.Web.Hubs.WorkflowHub>("/hubs/workflow");
 
 app.Run();
-

@@ -1,25 +1,36 @@
-﻿@model ErrorViewModel
+@model MangaWorkflow.Web.Models.ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    var statusCode = Model.StatusCode ?? 500;
+    var (icon, title, message) = statusCode switch
+    {
+        404 => ("bi-search", "Page Not Found", "The page you are looking for does not exist or has been moved."),
+        403 => ("bi-shield-lock", "Access Denied", "You do not have permission to view this page."),
+        401 => ("bi-person-lock", "Unauthorised", "Please log in to access this resource."),
+        _   => ("bi-exclamation-triangle", "Something Went Wrong", "An unexpected error occurred while processing your request.")
+    };
+    ViewData["Title"] = $"{statusCode} — {title}";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
-
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
-
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <i class="bi @icon" style="font-size: 5rem; color: #adb5bd;"></i>
+            <h1 class="display-1 fw-bold text-secondary mt-3">@statusCode</h1>
+            <h2 class="h4 mb-3">@title</h2>
+            <p class="text-muted mb-4">@message</p>
+            <a href="/" class="btn btn-primary me-2">
+                <i class="bi bi-house-door"></i> Return to Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </a>
+            @if (Model.ShowRequestId && statusCode >= 500)
+            {
+                <p class="text-muted mt-4 small">
+                    <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                </p>
+            }
+        </div>
+    </div>
+</div>
