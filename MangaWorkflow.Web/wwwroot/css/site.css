@@ -2,6 +2,131 @@ html {
   font-size: 14px;
 }
 
+.mw-hero {
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 50%, #fff7ed 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+.mw-stat {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  min-height: 112px;
+  padding: 1rem;
+  position: relative;
+}
+
+.mw-stat strong {
+  color: #111827;
+  display: block;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin-top: .35rem;
+}
+
+.mw-stat i {
+  color: #2563eb;
+  font-size: 1.4rem;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.mw-series-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  min-height: 158px;
+  overflow: hidden;
+}
+
+.mw-series-cover {
+  align-items: center;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  justify-content: center;
+  min-height: 158px;
+}
+
+.mw-series-cover img,
+.mw-series-index-cover {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.mw-series-index-cover {
+  aspect-ratio: 16 / 9;
+  max-height: 180px;
+}
+
+.mw-series-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.mw-panel,
+.mw-empty {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.mw-empty {
+  color: #6b7280;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.mw-empty i {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: .5rem;
+}
+
+.mw-flow {
+  display: grid;
+  gap: .75rem;
+}
+
+.mw-flow a {
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  display: flex;
+  gap: .75rem;
+  padding: .75rem;
+  text-decoration: none;
+}
+
+.mw-flow a:hover {
+  background: #f8fafc;
+}
+
+@media (max-width: 768px) {
+  .mw-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mw-series-card {
+    grid-template-columns: 96px 1fr;
+  }
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;

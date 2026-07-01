@@ -44,8 +44,15 @@
         {
             <div class="col">
                 <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrWhiteSpace(series.CoverImageUrl))
+                    {
+                        <img src="@series.CoverImageUrl" class="card-img-top mw-series-index-cover" alt="@series.Title cover" />
+                    }
                     <div class="card-body">
-                        <div class="bg-light rounded d-flex justify-content-center align-items-center text-muted mb-3" style="height: 150px;">No Image</div>
+                        @if (string.IsNullOrWhiteSpace(series.CoverImageUrl))
+                        {
+                            <div class="bg-light rounded d-flex justify-content-center align-items-center text-muted mb-3" style="height: 150px;">No Image</div>
+                        }
                         <h5 class="card-title">@series.Title</h5>
                         <p class="text-muted small mb-1">@series.Genre</p>
                         <span class="badge bg-@(series.StatusCode == "Draft" ? "secondary" : series.StatusCode == "Submitted" ? "info" : "success")">

@@ -335,3 +335,25 @@ Completed: 2026-07-01
 - [x] Targeted test passes: `ProcessRankingRisksAsync_ClampsCancellationRiskScoreAt100`.
 - [x] `dotnet test` passes: 19/19.
 - [x] `dotnet build` passes with 0 errors.
+
+---
+
+## Mangaka Dashboard Fix (DONE)
+
+Status: DONE
+Completed: 2026-07-01
+
+### What was fixed
+- [x] Added missing `/Mangaka/Dashboard` MVC view so `mangaka@manga.local` no longer hits
+  `InvalidOperationException: The view 'Index' was not found`.
+- [x] Built a demo-ready Mangaka dashboard with summary metrics, quick actions, recent series,
+  cover images, and SignalR notification proof notes.
+- [x] Added `CoverImageUrl` to `SeriesListItemDto` and mapping so series list/dashboard cards
+  can show seeded cover images.
+- [x] Updated local demo DB text from `Crimson CafĂ©` to `Crimson Cafe`.
+
+### Verification
+- [x] `dotnet build` passes with 0 errors.
+- [x] `dotnet test` passes: 19/19.
+- [x] Browser automation login as `mangaka@manga.local` reaches `/Mangaka/Dashboard`
+  with 4 metric cards, 6 recent series cards, 6 cover images, and no HTTP 500 responses.

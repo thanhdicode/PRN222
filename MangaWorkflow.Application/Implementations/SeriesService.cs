@@ -183,6 +183,7 @@ namespace MangaWorkflow.Application.Services
             Genre = s.Genre,
             StatusCode = s.SeriesStatus?.StatusCode ?? "",
             StatusName = s.SeriesStatus?.StatusName ?? "",
+            CoverImageUrl = s.CoverImageUrl,
             MangakaName = s.Mangaka?.FullName,
             CreatedAt = s.CreatedAt,
             ChapterCount = s.Chapters?.Count ?? 0,
