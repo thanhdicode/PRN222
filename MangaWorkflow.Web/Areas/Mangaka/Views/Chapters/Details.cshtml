@@ -2,12 +2,18 @@
 @{
     ViewData["Title"] = $"Chapter {Model.ChapterNumber}";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    // B1 FIX: If Title was saved with "Chapter N:" prefix (e.g. "Chapter 1: The Beginning"),
+    // strip it before rendering to avoid duplicate: "Chapter 1: Chapter 1: The Beginning"
+    var chapterPrefix = $"Chapter {Model.ChapterNumber}:";
+    var displayTitle = Model.Title.StartsWith(chapterPrefix, StringComparison.OrdinalIgnoreCase)
+        ? Model.Title.Substring(chapterPrefix.Length).Trim()
+        : Model.Title;
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">Chapter @Model.ChapterNumber: @Model.Title</h1>
+            <h1 class="h3 mb-0">Chapter @Model.ChapterNumber: @displayTitle</h1>
             <p class="text-muted mb-0">Series: @Model.SeriesTitle</p>
         </div>
         <div>
@@ -36,7 +42,7 @@
                     <dl class="row mb-0">
                         <dt class="col-sm-4">Status</dt>
                         <dd class="col-sm-8"><span class="badge bg-primary">@Model.StatusName</span></dd>
-                        
+
                         <dt class="col-sm-4">Number</dt>
                         <dd class="col-sm-8">@Model.ChapterNumber</dd>
 
@@ -53,7 +59,7 @@
                     <p class="card-text" style="white-space: pre-wrap;">@(string.IsNullOrWhiteSpace(Model.Synopsis) ? "No synopsis provided." : Model.Synopsis)</p>
                 </div>
             </div>
-            
+
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Page Summary</h5>
