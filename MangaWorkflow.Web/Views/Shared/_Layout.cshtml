@@ -42,7 +42,8 @@
                                         <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
                                         <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="BackgroundJobs" asp-action="Index">Background Jobs</a></li>
+                                        <%-- B3 FIX: BackgroundJobsController uses [Route("admin/jobs")], use direct href instead of asp-controller tag helper --%>
+                                        <li><a class="dropdown-item" href="/admin/jobs">Background Jobs</a></li>
                                     </ul>
                                 </li>
                             }
@@ -86,12 +87,10 @@
                                     </ul>
                                 </li>
                             }
-                            @if (User.IsInRole("Editor") || User.IsInRole("TantouEditor") || User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="Mangaka" asp-controller="Series" asp-action="Index">Series (view pages)</a>
-                                </li>
-                            }
+                            @* B4/B5 FIX: Removed broken "Series (view pages)" link that pointed to
+                               /Mangaka/Series (MangakaOnly policy) causing 403 for Admin and Editor/TantouEditor roles.
+                               Admin does not need this link — they have the Admin dropdown.
+                               Editor/TantouEditor annotation UI is not yet implemented. *@
                         }
                     </ul>
                     <ul class="navbar-nav">
@@ -138,7 +137,7 @@
         </div>
     </footer>
     <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"></div>
-    
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
